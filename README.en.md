@@ -2,7 +2,8 @@
 
 Shared Steam routing for Clash Verge Rev on Windows.
 
-[简体中文](README.md)
+[![简体中文](https://img.shields.io/badge/简体中文-阅读-0366d6?style=for-the-badge)](README.md)
+[![English](https://img.shields.io/badge/English-Current-2ea44f?style=for-the-badge)](README.en.md)
 
 ## Project Status
 

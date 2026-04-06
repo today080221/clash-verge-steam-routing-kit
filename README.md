@@ -2,7 +2,8 @@
 
 适用于 Windows 上 Clash Verge Rev 的共享 Steam 分流工具包。
 
-[English](README.en.md)
+[![简体中文](https://img.shields.io/badge/简体中文-当前-2ea44f?style=for-the-badge)](README.md)
+[![English](https://img.shields.io/badge/English-Read-0366d6?style=for-the-badge)](README.en.md)
 
 ## 项目状态
 
