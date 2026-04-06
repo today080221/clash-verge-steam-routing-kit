@@ -2,6 +2,8 @@
 
 Shared Steam routing for Clash Verge Rev on Windows.
 
+[简体中文](README.zh-CN.md)
+
 ## Project Status
 
 This repository is an AI-generated project.
