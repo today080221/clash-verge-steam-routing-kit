@@ -1,0 +1,19 @@
+# Sensitive local Clash Verge Rev state
+profiles.yaml
+steam-script-sync.log
+cache.db
+clash-verge.yaml
+clash-verge-check.yaml
+config.yaml
+verge.yaml
+window_state.json
+dns_config.yaml
+
+# Provider-specific local profiles
+profiles/
+*.db
+*.sqlite
+
+# OS noise
+desktop.ini
+Thumbs.db
