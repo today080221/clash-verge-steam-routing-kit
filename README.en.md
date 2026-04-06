@@ -54,6 +54,7 @@ If the Steam store shows `-100`, temporarily change `SteamMainland` from `DIRECT
 
 ## Files
 
+- `AGENTS.md`: project-specific operating guidance for Codex and other agents
 - `install-steam-routing.bat`: one-click installer for release users
 - `Script.js`: shared Clash Verge Rev profile script
 - `install-steam-routing.ps1`: one-shot installer for a new PC

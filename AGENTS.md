@@ -75,6 +75,7 @@ Preferred release asset filename:
 
 The release zip should include:
 
+- `AGENTS.md`
 - `install-steam-routing.bat`
 - `install-steam-routing.ps1`
 - `sync-clash-verge-steam-script.ps1`
@@ -136,6 +137,7 @@ Before finishing a change, check at least:
 - `README.md` and `README.en.md` stay in sync structurally
 - install entrypoints still exist and use the expected filenames
 - release-facing filenames referenced in docs match the repository files
+- `AGENTS.md` stays aligned with the actual documentation and release workflow
 - no sensitive local files are staged
 
 ## Git Hygiene

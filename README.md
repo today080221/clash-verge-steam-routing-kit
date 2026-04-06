@@ -54,6 +54,7 @@ powershell -ExecutionPolicy Bypass -File .\install-steam-routing.ps1
 
 ## 文件说明
 
+- `AGENTS.md`：面向 Codex 或其他 agent 的项目操作约定
 - `install-steam-routing.bat`：面向 Release 用户的一键安装入口
 - `Script.js`：共享的 Clash Verge Rev 配置脚本
 - `install-steam-routing.ps1`：新电脑的一键安装脚本
