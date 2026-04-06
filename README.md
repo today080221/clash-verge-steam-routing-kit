@@ -31,8 +31,8 @@
 3. 克隆本仓库，或把整个目录复制到目标机器。
 4. 运行：
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install-steam-routing.ps1
+```bat
+install-steam-routing.bat
 ```
 
 5. 重启一次 Clash Verge Rev，或者切换一次订阅。
@@ -44,6 +44,8 @@ powershell -ExecutionPolicy Bypass -File .\install-steam-routing.ps1
 3. 双击 `install-steam-routing.bat`。
 4. 重启一次 Clash Verge Rev，或者切换一次订阅。
 
+只要下载一次即可。之后继续运行同一个 `install-steam-routing.bat`，它会先检查 GitHub 上是否有新的 Release；如果有，就会自动下载并切换到新版本后再执行安装。若 GitHub 检查超时，会在控制台里询问你是仅执行一次本地脚本，还是直接退出。
+
 ## 推荐默认设置
 
 - `SteamCommunity`：使用 `自动选择`，或手动指定香港/日本节点
@@ -54,12 +56,14 @@ powershell -ExecutionPolicy Bypass -File .\install-steam-routing.ps1
 
 ## 文件说明
 
+- `bootstrap-install.ps1`：自动更新启动器，负责检查 GitHub Release、下载新版本并切换执行
 - `AGENTS.md`：面向 Codex 或其他 agent 的项目操作约定
-- `install-steam-routing.bat`：面向 Release 用户的一键安装入口
+- `install-steam-routing.bat`：面向 Release 用户的一键安装入口，每次运行都会先检查更新
 - `Script.js`：共享的 Clash Verge Rev 配置脚本
 - `install-steam-routing.ps1`：新电脑的一键安装脚本
 - `sync-clash-verge-steam-script.ps1`：后台监控脚本，会把远程订阅重新绑定到 `Script.js`
 - `Start ClashVerge Steam Sync.vbs`：开机启动入口，用于隐藏启动监控脚本
+- `VERSION`：当前本地包版本号，供自动更新逻辑比较使用
 - `Merge.yaml`：用于兼容全局 Merge 卡片的占位文件
 
 ## 安全说明

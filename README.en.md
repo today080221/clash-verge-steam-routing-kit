@@ -31,8 +31,8 @@ It injects three reusable groups into any subscribed profile:
 3. Clone this repo or copy the folder to that machine.
 4. Run:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install-steam-routing.ps1
+```bat
+install-steam-routing.bat
 ```
 
 5. Restart Clash Verge Rev once, or switch subscriptions once.
@@ -44,6 +44,8 @@ powershell -ExecutionPolicy Bypass -File .\install-steam-routing.ps1
 3. Double-click `install-steam-routing.bat`.
 4. Restart Clash Verge Rev once, or switch subscriptions once.
 
+You only need to download the package once. After that, keep using the same `install-steam-routing.bat`: it checks GitHub for newer releases before running the installer, downloads updates automatically when available, and falls back to a console prompt if the GitHub check times out.
+
 ## Recommended Defaults
 
 - `SteamCommunity`: use `Auto Select` or a Hong Kong/Japan node
@@ -54,12 +56,14 @@ If the Steam store shows `-100`, temporarily change `SteamMainland` from `DIRECT
 
 ## Files
 
+- `bootstrap-install.ps1`: auto-update bootstrap that checks GitHub releases, downloads newer packages, and hands off execution
 - `AGENTS.md`: project-specific operating guidance for Codex and other agents
-- `install-steam-routing.bat`: one-click installer for release users
+- `install-steam-routing.bat`: one-click installer entrypoint that checks for updates before each run
 - `Script.js`: shared Clash Verge Rev profile script
 - `install-steam-routing.ps1`: one-shot installer for a new PC
 - `sync-clash-verge-steam-script.ps1`: background watcher that rebinds remote subscriptions to `Script.js`
 - `Start ClashVerge Steam Sync.vbs`: startup entry that launches the watcher hidden
+- `VERSION`: local package version used by the auto-update comparison
 - `Merge.yaml`: placeholder to satisfy the global merge card
 
 ## Safety Notes

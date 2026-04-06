@@ -76,6 +76,7 @@ Preferred release asset filename:
 The release zip should include:
 
 - `AGENTS.md`
+- `bootstrap-install.ps1`
 - `install-steam-routing.bat`
 - `install-steam-routing.ps1`
 - `sync-clash-verge-steam-script.ps1`
@@ -84,6 +85,7 @@ The release zip should include:
 - `Merge.yaml`
 - `README.md`
 - `README.en.md`
+- `VERSION`
 - `LICENSE`
 
 If documentation language layout changes, publish a new release so downloaded assets match the repository homepage.
@@ -94,12 +96,21 @@ For end users, the preferred entrypoint is:
 
 - `install-steam-routing.bat`
 
-That batch file should stay simple and call the PowerShell installer:
+That batch file should stay simple and call the PowerShell bootstrap:
+
+- `bootstrap-install.ps1`
+
+The bootstrap is responsible for:
+
+- checking the latest GitHub release
+- downloading and caching a newer release package when available
+- falling back to a timeout prompt so the user can run the local installer once or exit
+
+The actual installer logic should remain in:
 
 - `install-steam-routing.ps1`
 
-The PowerShell installer is the source of truth for installation logic.
-Do not duplicate complex install logic into the batch file.
+Do not duplicate complex update or install logic into the batch file.
 
 ## Security And Privacy
 
@@ -136,6 +147,7 @@ Before finishing a change, check at least:
 
 - `README.md` and `README.en.md` stay in sync structurally
 - install entrypoints still exist and use the expected filenames
+- `VERSION` matches the intended release version when cutting a release
 - release-facing filenames referenced in docs match the repository files
 - `AGENTS.md` stays aligned with the actual documentation and release workflow
 - no sensitive local files are staged
