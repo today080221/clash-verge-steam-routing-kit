@@ -2,6 +2,12 @@
 
 Shared Steam routing for Clash Verge Rev on Windows.
 
+## Project Status
+
+This repository is an AI-generated project.
+
+The code, structure, and documentation were produced through AI-assisted generation and iteration. Please review the scripts before using them in your own environment.
+
 It injects three reusable groups into any subscribed profile:
 
 - `SteamCommunity`: Steam community, chat, avatars, and other commonly blocked Steam web content
@@ -30,7 +36,7 @@ powershell -ExecutionPolicy Bypass -File .\install-steam-routing.ps1
 
 ## Recommended Defaults
 
-- `SteamCommunity`: use `自动选择` or a Hong Kong/Japan node
+- `SteamCommunity`: use `Auto Select` or a Hong Kong/Japan node
 - `SteamMainland`: use `DIRECT` first
 - `SteamDownload`: use `DIRECT`
 
@@ -47,5 +53,9 @@ If the Steam store shows `-100`, temporarily change `SteamMainland` from `DIRECT
 ## Safety Notes
 
 - Do not commit `profiles.yaml`, provider subscription YAML files, or subscription URLs/tokens
-- This repo is best kept private
+- This public repo intentionally contains only the reusable routing framework, not your personal provider configs
 - The installer does not copy your provider profiles; it only installs the shared Steam routing framework
+
+## License
+
+MIT. See [LICENSE](LICENSE).
