@@ -1,71 +1,71 @@
 # Clash Verge Steam Routing Kit
 
-Shared Steam routing for Clash Verge Rev on Windows.
+适用于 Windows 上 Clash Verge Rev 的共享 Steam 分流工具包。
 
-[简体中文](README.zh-CN.md)
+[English](README.en.md)
 
-## Project Status
+## 项目状态
 
-This repository is an AI-generated project.
+这是一个 AI 生成项目。
 
-The code, structure, and documentation were produced through AI-assisted generation and iteration. Please review the scripts before using them in your own environment.
+本仓库的代码、结构和文档均通过 AI 辅助生成与迭代完成。在你自己的环境中使用前，建议先自行审阅相关脚本。
 
-It injects three reusable groups into any subscribed profile:
+它会向任意订阅配置中注入 3 个可复用的分组：
 
-- `SteamCommunity`: Steam community, chat, avatars, and other commonly blocked Steam web content
-- `SteamMainland`: Steam store, login, help, and general Steam web traffic that usually works well from mainland China
-- `SteamDownload`: Steam CDN, content servers, and download-related traffic
+- `SteamCommunity`：Steam 社区、聊天、头像，以及其他常见会被拦截的 Steam Web 内容
+- `SteamMainland`：Steam 商店、登录、帮助，以及通常在中国大陆可正常访问的 Steam Web 流量
+- `SteamDownload`：Steam CDN、内容服务器，以及下载相关流量
 
-## What This Repo Solves
+## 这个仓库解决什么问题
 
-- Keeps Steam routing logic in one place across multiple PCs
-- Applies the same Steam split-routing behavior across different service providers
-- Rebinds newly added remote subscriptions to the shared `Script.js`
-- Separates community, store/login, and download traffic so they can be tuned independently
+- 在多台电脑之间复用同一套 Steam 分流逻辑
+- 在不同服务商之间应用同样的 Steam 分流策略
+- 自动把新接入的远程订阅重新绑定到共享 `Script.js`
+- 将社区、商店/登录、下载流量拆开，方便分别调控
 
-## Install on Another Windows PC
+## 在另一台 Windows 电脑上安装
 
-1. Install Clash Verge Rev and open it once.
-2. Import your subscription(s) normally.
-3. Clone this repo or copy the folder to that machine.
-4. Run:
+1. 安装 Clash Verge Rev，并至少打开一次。
+2. 正常导入你的订阅。
+3. 克隆本仓库，或把整个目录复制到目标机器。
+4. 运行：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install-steam-routing.ps1
 ```
 
-5. Restart Clash Verge Rev once, or switch subscriptions once.
+5. 重启一次 Clash Verge Rev，或者切换一次订阅。
 
-## Quick Install from a Release
+## 通过 Release 快速安装
 
-1. Download the latest release zip from the Releases page.
-2. Extract it to any folder.
-3. Double-click `install-steam-routing.bat`.
-4. Restart Clash Verge Rev once, or switch subscriptions once.
+1. 从 Releases 页面下载最新版本 zip。
+2. 解压到任意目录。
+3. 双击 `install-steam-routing.bat`。
+4. 重启一次 Clash Verge Rev，或者切换一次订阅。
 
-## Recommended Defaults
+## 推荐默认设置
 
-- `SteamCommunity`: use `Auto Select` or a Hong Kong/Japan node
-- `SteamMainland`: use `DIRECT` first
-- `SteamDownload`: use `DIRECT`
+- `SteamCommunity`：使用 `自动选择`，或手动指定香港/日本节点
+- `SteamMainland`：优先使用 `DIRECT`
+- `SteamDownload`：使用 `DIRECT`
 
-If the Steam store shows `-100`, temporarily change `SteamMainland` from `DIRECT` to the same node as `SteamCommunity` and test again.
+如果 Steam 商店出现 `-100` 错误，可以临时把 `SteamMainland` 从 `DIRECT` 改成和 `SteamCommunity` 相同的节点，再重新测试。
 
-## Files
+## 文件说明
 
-- `install-steam-routing.bat`: one-click installer for release users
-- `Script.js`: shared Clash Verge Rev profile script
-- `install-steam-routing.ps1`: one-shot installer for a new PC
-- `sync-clash-verge-steam-script.ps1`: background watcher that rebinds remote subscriptions to `Script.js`
-- `Start ClashVerge Steam Sync.vbs`: startup entry that launches the watcher hidden
-- `Merge.yaml`: placeholder to satisfy the global merge card
+- `install-steam-routing.bat`：面向 Release 用户的一键安装入口
+- `Script.js`：共享的 Clash Verge Rev 配置脚本
+- `install-steam-routing.ps1`：新电脑的一键安装脚本
+- `sync-clash-verge-steam-script.ps1`：后台监控脚本，会把远程订阅重新绑定到 `Script.js`
+- `Start ClashVerge Steam Sync.vbs`：开机启动入口，用于隐藏启动监控脚本
+- `Merge.yaml`：用于兼容全局 Merge 卡片的占位文件
 
-## Safety Notes
+## 安全说明
 
-- Do not commit `profiles.yaml`, provider subscription YAML files, or subscription URLs/tokens
-- This public repo intentionally contains only the reusable routing framework, not your personal provider configs
-- The installer does not copy your provider profiles; it only installs the shared Steam routing framework
+- 不要把 `profiles.yaml`、服务商订阅 YAML，或者带 token 的订阅链接提交到仓库
+- 这个公开仓库只包含可复用的分流框架，不包含你的个人服务商配置
+- 安装脚本不会复制你的服务商订阅文件，它只安装共享的 Steam 分流框架
 
-## License
+## 许可证
 
-MIT. See [LICENSE](LICENSE).
+MIT，详见 [LICENSE](LICENSE)。
