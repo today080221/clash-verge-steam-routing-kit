@@ -36,6 +36,13 @@ powershell -ExecutionPolicy Bypass -File .\install-steam-routing.ps1
 
 5. Restart Clash Verge Rev once, or switch subscriptions once.
 
+## Quick Install from a Release
+
+1. Download the latest release zip from the Releases page.
+2. Extract it to any folder.
+3. Double-click `install-steam-routing.bat`.
+4. Restart Clash Verge Rev once, or switch subscriptions once.
+
 ## Recommended Defaults
 
 - `SteamCommunity`: use `Auto Select` or a Hong Kong/Japan node
@@ -46,6 +53,7 @@ If the Steam store shows `-100`, temporarily change `SteamMainland` from `DIRECT
 
 ## Files
 
+- `install-steam-routing.bat`: one-click installer for release users
 - `Script.js`: shared Clash Verge Rev profile script
 - `install-steam-routing.ps1`: one-shot installer for a new PC
 - `sync-clash-verge-steam-script.ps1`: background watcher that rebinds remote subscriptions to `Script.js`

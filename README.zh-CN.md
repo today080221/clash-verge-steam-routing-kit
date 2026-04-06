@@ -36,6 +36,13 @@ powershell -ExecutionPolicy Bypass -File .\install-steam-routing.ps1
 
 5. 重启一次 Clash Verge Rev，或者切换一次订阅。
 
+## 通过 Release 快速安装
+
+1. 从 Releases 页面下载最新版本 zip。
+2. 解压到任意目录。
+3. 双击 `install-steam-routing.bat`。
+4. 重启一次 Clash Verge Rev，或者切换一次订阅。
+
 ## 推荐默认设置
 
 - `SteamCommunity`：使用 `自动选择`，或手动指定香港/日本节点
@@ -46,6 +53,7 @@ powershell -ExecutionPolicy Bypass -File .\install-steam-routing.ps1
 
 ## 文件说明
 
+- `install-steam-routing.bat`：面向 Release 用户的一键安装入口
 - `Script.js`：共享的 Clash Verge Rev 配置脚本
 - `install-steam-routing.ps1`：新电脑的一键安装脚本
 - `sync-clash-verge-steam-script.ps1`：后台监控脚本，会把远程订阅重新绑定到 `Script.js`
