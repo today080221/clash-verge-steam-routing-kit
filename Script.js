@@ -16,6 +16,7 @@ function pickGroupNames(groups, preferred) {
     .map((group) => group && group.name)
     .filter((name) =>
       name &&
+      name !== "UnityHub" &&
       name !== "SteamCommunity" &&
       name !== "SteamMainland" &&
       name !== "SteamDownload"
@@ -79,13 +80,25 @@ function main(config) {
     ...preferredGroups,
     ...proxyNames,
   ]);
+  const unityHubChoices = unique([
+    ...preferredGroups,
+    ...proxyNames,
+    "DIRECT",
+  ]);
 
   let nextGroups = proxyGroups;
   nextGroups = upsertSelectGroup(nextGroups, "SteamDownload", steamDownloadChoices);
   nextGroups = upsertSelectGroup(nextGroups, "SteamMainland", steamMainlandChoices);
   nextGroups = upsertSelectGroup(nextGroups, "SteamCommunity", steamCommunityChoices);
+  nextGroups = upsertSelectGroup(nextGroups, "UnityHub", unityHubChoices);
   nextConfig["proxy-groups"] = nextGroups;
 
+  const unityHubRules = [
+    "DOMAIN-SUFFIX,unity.com,UnityHub",
+    "DOMAIN-SUFFIX,unity3d.com,UnityHub",
+    "DOMAIN-SUFFIX,plasticscm.com,UnityHub",
+    "DOMAIN-SUFFIX,unitychina.cn,UnityHub",
+  ];
   const steamRules = [
     "DOMAIN-SUFFIX,steamcommunity.com,SteamCommunity",
     "DOMAIN-SUFFIX,steam-chat.com,SteamCommunity",
@@ -115,6 +128,6 @@ function main(config) {
     "DOMAIN-SUFFIX,cdn.cloudflare.steamstatic.com,SteamMainland",
   ];
 
-  prependRules(nextConfig, steamRules);
+  prependRules(nextConfig, [...unityHubRules, ...steamRules]);
   return nextConfig;
 }

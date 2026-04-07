@@ -4,10 +4,11 @@ This file captures project-specific guidance for agents working in this reposito
 
 ## Purpose
 
-This repository is a reusable Steam routing kit for Clash Verge Rev on Windows.
+This repository is a reusable Steam routing kit for Clash Verge Rev on Windows, with an additional dedicated Unity Hub bypass group.
 
 It provides a shared routing layer that:
 
+- splits Unity traffic into `UnityHub`
 - splits Steam traffic into `SteamCommunity`, `SteamMainland`, and `SteamDownload`
 - keeps the same routing logic reusable across different providers
 - supports multi-PC installation through local scripts and release assets
@@ -16,12 +17,14 @@ It provides a shared routing layer that:
 
 Treat the following group names as stable public interface unless the user explicitly asks to rename them:
 
+- `UnityHub`
 - `SteamCommunity`
 - `SteamMainland`
 - `SteamDownload`
 
 The intended defaults are:
 
+- `UnityHub`: proxy or auto-select
 - `SteamCommunity`: proxy or auto-select
 - `SteamMainland`: `DIRECT` first
 - `SteamDownload`: `DIRECT`
@@ -130,9 +133,9 @@ This public repository should contain only the reusable framework.
 
 When changing routing behavior:
 
-- preserve the three-group split unless explicitly asked to redesign it
+- preserve the Unity plus three-way Steam split unless explicitly asked to redesign it
 - prefer additive, targeted rule fixes over broad changes
-- remember that Steam community traffic, mainland web traffic, and download traffic may need different routing behavior
+- remember that Unity Hub traffic, Steam community traffic, mainland web traffic, and download traffic may need different routing behavior
 - keep installation and release docs aligned with actual script behavior
 
 When changing public-facing text:

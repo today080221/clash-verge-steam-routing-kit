@@ -1,6 +1,6 @@
 # Clash Verge Steam Routing Kit
 
-适用于 Windows 上 Clash Verge Rev 的共享 Steam 分流工具包。
+适用于 Windows 上 Clash Verge Rev 的共享 Steam 分流工具包，并额外提供独立的 Unity Hub 绕行分组。
 
 [![简体中文](https://img.shields.io/badge/简体中文-当前-2ea44f?style=for-the-badge)](README.md)
 [![English](https://img.shields.io/badge/English-Read-0366d6?style=for-the-badge)](README.en.md)
@@ -11,18 +11,19 @@
 
 本仓库的代码、结构和文档均通过 AI 辅助生成与迭代完成。在你自己的环境中使用前，建议先自行审阅相关脚本。
 
-它会向任意订阅配置中注入 3 个可复用的分组：
+它会向任意订阅配置中注入 4 个可复用的分组：
 
+- `UnityHub`：Unity Hub、Unity 登录与许可证、Package Manager、Asset Store，以及相关 Unity 官方域名流量
 - `SteamCommunity`：Steam 社区、聊天、头像，以及其他常见会被拦截的 Steam Web 内容
 - `SteamMainland`：Steam 商店、登录、帮助，以及通常在中国大陆可正常访问的 Steam Web 流量
 - `SteamDownload`：Steam CDN、内容服务器，以及下载相关流量
 
 ## 这个仓库解决什么问题
 
-- 在多台电脑之间复用同一套 Steam 分流逻辑
-- 在不同服务商之间应用同样的 Steam 分流策略
+- 在多台电脑之间复用同一套 Steam 与 Unity Hub 分流逻辑
+- 在不同服务商之间应用同样的 Steam 与 Unity Hub 分流策略
 - 自动把新接入的远程订阅重新绑定到共享 `Script.js`
-- 将社区、商店/登录、下载流量拆开，方便分别调控
+- 将 Steam 的社区、商店/登录、下载流量拆开，外加独立的 `UnityHub` 分组，方便分别调控
 
 ## 在另一台 Windows 电脑上安装
 
@@ -48,11 +49,14 @@ install-steam-routing.bat
 
 ## 推荐默认设置
 
+- `UnityHub`：使用 `自动选择`，或手动指定一个稳定的海外节点，用于全面绕开 Unity 中国链路
 - `SteamCommunity`：使用 `自动选择`，或手动指定香港/日本节点
 - `SteamMainland`：优先使用 `DIRECT`
 - `SteamDownload`：使用 `DIRECT`
 
 如果 Steam 商店出现 `-100` 错误，可以临时把 `SteamMainland` 从 `DIRECT` 改成和 `SteamCommunity` 相同的节点，再重新测试。
+
+当前 `UnityHub` 分组优先覆盖 Unity 官方文档中建议加入代理/白名单的 Unity 自有域名，包括 `unity.com`、`unity3d.com`、`plasticscm.com` 和 `unitychina.cn`。这样可以把 Unity Hub、登录、许可证、Package Manager、Asset Store 以及 Unity 版本控制相关流量统一交给同一个分组处理，同时尽量避免把无关的 Google 或 Microsoft 全局域名一起带进去。
 
 ## 文件说明
 
