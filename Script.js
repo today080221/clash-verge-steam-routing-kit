@@ -16,6 +16,8 @@ function pickGroupNames(groups, preferred) {
     .map((group) => group && group.name)
     .filter((name) =>
       name &&
+      name !== "UnityChina" &&
+      name !== "UnityDownload" &&
       name !== "UnityHub" &&
       name !== "SteamCommunity" &&
       name !== "SteamMainland" &&
@@ -80,6 +82,17 @@ function main(config) {
     ...preferredGroups,
     ...proxyNames,
   ]);
+  const unityChinaChoices = unique([
+    "REJECT",
+    "DIRECT",
+    ...preferredGroups,
+    ...proxyNames,
+  ]);
+  const unityDownloadChoices = unique([
+    ...preferredGroups,
+    ...proxyNames,
+    "DIRECT",
+  ]);
   const unityHubChoices = unique([
     ...preferredGroups,
     ...proxyNames,
@@ -90,14 +103,37 @@ function main(config) {
   nextGroups = upsertSelectGroup(nextGroups, "SteamDownload", steamDownloadChoices);
   nextGroups = upsertSelectGroup(nextGroups, "SteamMainland", steamMainlandChoices);
   nextGroups = upsertSelectGroup(nextGroups, "SteamCommunity", steamCommunityChoices);
+  nextGroups = upsertSelectGroup(nextGroups, "UnityChina", unityChinaChoices);
+  nextGroups = upsertSelectGroup(nextGroups, "UnityDownload", unityDownloadChoices);
   nextGroups = upsertSelectGroup(nextGroups, "UnityHub", unityHubChoices);
   nextConfig["proxy-groups"] = nextGroups;
 
   const unityHubRules = [
+    "DOMAIN-SUFFIX,unitychina.cn,UnityChina",
+    "DOMAIN-SUFFIX,unity.cn,UnityChina",
+    "DOMAIN-SUFFIX,u3d.cn,UnityChina",
+    "DOMAIN,download.unity3d.com,UnityDownload",
+    "DOMAIN,beta.unity3d.com,UnityDownload",
+    "DOMAIN,cdn.packages.unity.com,UnityDownload",
+    "DOMAIN,download.packages.unity.com,UnityDownload",
+    "DOMAIN,private.download.packages.unity.com,UnityDownload",
+    "DOMAIN,services.unity.com,UnityHub",
+    "DOMAIN,api.unity.com,UnityHub",
+    "DOMAIN,id.unity.com,UnityHub",
+    "DOMAIN,login.unity.com,UnityHub",
+    "DOMAIN,accounts.unity3d.com,UnityHub",
+    "DOMAIN,license.unity3d.com,UnityHub",
+    "DOMAIN,activation.unity3d.com,UnityHub",
+    "DOMAIN,assetstore.unity.com,UnityHub",
+    "DOMAIN,packages.unity.com,UnityHub",
+    "DOMAIN,packages-v2.unity.com,UnityHub",
+    "DOMAIN,public-cdn.cloud.unity3d.com,UnityHub",
+    "DOMAIN,core.cloud.unity3d.com,UnityHub",
+    "DOMAIN,live-platform-api.prd.ld.unity3d.com,UnityHub",
+    "DOMAIN-SUFFIX,hub-proxy.unity3d.com,UnityHub",
     "DOMAIN-SUFFIX,unity.com,UnityHub",
     "DOMAIN-SUFFIX,unity3d.com,UnityHub",
     "DOMAIN-SUFFIX,plasticscm.com,UnityHub",
-    "DOMAIN-SUFFIX,unitychina.cn,UnityHub",
   ];
   const steamRules = [
     "DOMAIN-SUFFIX,steamcommunity.com,SteamCommunity",

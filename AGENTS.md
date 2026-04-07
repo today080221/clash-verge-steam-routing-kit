@@ -4,11 +4,11 @@ This file captures project-specific guidance for agents working in this reposito
 
 ## Purpose
 
-This repository is a reusable Steam routing kit for Clash Verge Rev on Windows, with an additional dedicated Unity Hub bypass group.
+This repository is a reusable Steam and Unity routing kit for Clash Verge Rev on Windows, with an explicit Unity China isolation layer.
 
 It provides a shared routing layer that:
 
-- splits Unity traffic into `UnityHub`
+- splits Unity traffic into `UnityHub`, `UnityDownload`, and `UnityChina`
 - splits Steam traffic into `SteamCommunity`, `SteamMainland`, and `SteamDownload`
 - keeps the same routing logic reusable across different providers
 - supports multi-PC installation through local scripts and release assets
@@ -18,6 +18,8 @@ It provides a shared routing layer that:
 Treat the following group names as stable public interface unless the user explicitly asks to rename them:
 
 - `UnityHub`
+- `UnityDownload`
+- `UnityChina`
 - `SteamCommunity`
 - `SteamMainland`
 - `SteamDownload`
@@ -25,6 +27,8 @@ Treat the following group names as stable public interface unless the user expli
 The intended defaults are:
 
 - `UnityHub`: proxy or auto-select
+- `UnityDownload`: the same proxy or auto-select as `UnityHub`
+- `UnityChina`: `REJECT`
 - `SteamCommunity`: proxy or auto-select
 - `SteamMainland`: `DIRECT` first
 - `SteamDownload`: `DIRECT`
@@ -133,9 +137,10 @@ This public repository should contain only the reusable framework.
 
 When changing routing behavior:
 
-- preserve the Unity plus three-way Steam split unless explicitly asked to redesign it
+- preserve the Unity three-way split plus three-way Steam split unless explicitly asked to redesign it
 - prefer additive, targeted rule fixes over broad changes
-- remember that Unity Hub traffic, Steam community traffic, mainland web traffic, and download traffic may need different routing behavior
+- remember that Unity global control traffic, Unity global download traffic, Unity China traffic, Steam community traffic, mainland web traffic, and download traffic may need different routing behavior
+- keep `UnityChina` isolated from the global Unity path unless the user explicitly asks otherwise
 - keep installation and release docs aligned with actual script behavior
 
 When changing public-facing text:
