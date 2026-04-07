@@ -73,9 +73,20 @@ If Unity Hub still shows `Validation Failed`:
 
 - make sure `UnityHub` and `UnityDownload` are not `DIRECT`
 - prefer using the same stable overseas node for both
-- if a node returns empty responses for `public-cdn.cloud.unity3d.com` or `download.unity3d.com`, try Japan, US, or Singapore
+- run `test-unity-routing.bat` first
+- if the script shows `302 -> download.unitychina.cn -> 404` on the direct path but `200` on the Clash proxy path, Unity is not entering Clash reliably enough; prefer `Rule mode + TUN enabled`
+- if the Clash proxy path itself still returns `302` or `404`, that node is still being sent to the Unity China mirror even though it is an overseas node; switch `UnityHub` and `UnityDownload` together and test again
+- if a node passes the `200/206` checks but large downloads still hit `ECONNRESET`, compare more nodes with the script instead of trusting the region label alone
 
 If the Steam store shows `-100`, temporarily change `SteamMainland` from `DIRECT` to the same node as `SteamCommunity` and test again.
+
+Recommended commands for Unity 404/302/reset troubleshooting:
+
+```bat
+test-unity-routing.bat
+```
+
+It compares the current direct path and the current Clash proxy path. After switching `UnityHub` and `UnityDownload` to another node in Clash Verge Rev, run the script again to compare the next candidate.
 
 ## Files
 
@@ -86,6 +97,8 @@ If the Steam store shows `-100`, temporarily change `SteamMainland` from `DIRECT
 - `install-steam-routing.ps1`: one-shot installer for a new PC
 - `sync-clash-verge-steam-script.ps1`: background watcher that rebinds remote subscriptions to `Script.js`
 - `Start ClashVerge Steam Sync.vbs`: startup entry that launches the watcher hidden
+- `test-unity-routing.bat`: one-click entrypoint for Unity 404/302/reset diagnosis
+- `test-unity-routing.ps1`: Unity diagnostic script that compares direct vs proxied requests
 - `VERSION`: local package version used by the auto-update comparison
 - `Merge.yaml`: placeholder to satisfy the global merge card
 

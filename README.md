@@ -73,9 +73,20 @@ install-steam-routing.bat
 
 - 先确认 `UnityHub` 与 `UnityDownload` 不是 `DIRECT`
 - 尽量让 `UnityHub` 与 `UnityDownload` 使用同一个稳定海外节点
-- 如果某个节点对 `public-cdn.cloud.unity3d.com` 或 `download.unity3d.com` 返回空响应，优先换日本、美国或新加坡节点
+- 先运行 `test-unity-routing.bat` 做对照验证
+- 如果脚本显示“直连链路是 `302 -> download.unitychina.cn -> 404`，但 Clash 代理链路是 `200`”，说明 Unity 请求没有稳定进 Clash，优先改成 `规则模式 + 开启 TUN`
+- 如果脚本显示“Clash 代理链路本身仍然是 `302` 或 `404`”，说明当前节点虽然在海外，但 Unity 还是被分配到了中国镜像，直接换 `UnityHub`/`UnityDownload` 节点并重测
+- 如果某个节点能通过 `200/206` 检查，但大文件中途 `ECONNRESET`，继续用脚本对比其他节点；不要只看地区名，先看真实 Unity 链路结果
 
 如果 Steam 商店出现 `-100` 错误，可以临时把 `SteamMainland` 从 `DIRECT` 改成和 `SteamCommunity` 相同的节点再测试。
+
+用于 Unity 404/302/掉线排查的推荐命令：
+
+```bat
+test-unity-routing.bat
+```
+
+它会直接对照当前配置下的“直连”和“Clash 代理”结果。切到别的 `UnityHub`/`UnityDownload` 节点后，再重新运行一次，就能继续做人工对照。
 
 ## 文件说明
 
@@ -86,6 +97,8 @@ install-steam-routing.bat
 - `install-steam-routing.ps1`：新电脑的一键安装脚本
 - `sync-clash-verge-steam-script.ps1`：后台监听脚本，会把远程订阅重新绑定到 `Script.js`
 - `Start ClashVerge Steam Sync.vbs`：开机启动入口，用于隐藏启动监听脚本
+- `test-unity-routing.bat`：Unity 下载 404/302/掉线的一键排查入口
+- `test-unity-routing.ps1`：Unity 诊断脚本，可对比直连/代理结果
 - `VERSION`：当前本地包版本号，供自动更新逻辑比较使用
 - `Merge.yaml`：用于兼容全局 Merge 卡片的占位文件
 

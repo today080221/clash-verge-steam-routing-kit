@@ -88,6 +88,8 @@ The release zip should include:
 - `install-steam-routing.ps1`
 - `sync-clash-verge-steam-script.ps1`
 - `Start ClashVerge Steam Sync.vbs`
+- `test-unity-routing.bat`
+- `test-unity-routing.ps1`
 - `Script.js`
 - `Merge.yaml`
 - `README.md`
@@ -118,6 +120,21 @@ The actual installer logic should remain in:
 - `install-steam-routing.ps1`
 
 Do not duplicate complex update or install logic into the batch file.
+
+## Diagnostic Conventions
+
+For Unity download troubleshooting, the preferred entrypoint is:
+
+- `test-unity-routing.bat`
+
+That batch file should stay simple and call:
+
+- `test-unity-routing.ps1`
+
+The diagnostic script is responsible for:
+
+- comparing direct Unity download results against the current Clash-proxied results
+- showing current Clash mode, TUN state, system proxy state, and Unity group selections
 
 ## Security And Privacy
 
