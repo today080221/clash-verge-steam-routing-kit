@@ -384,7 +384,7 @@ function Get-DiagnosisLines {
     }
   }
 
-  $lines.Add("Recommended stable pattern: keep Clash in Rule mode, keep UnityHub and UnityDownload on the same tested-good node, keep UnityChina on REJECT, and enable TUN when Unity does not reliably honor the system proxy.")
+  $lines.Add("Recommended stable pattern: keep Clash in Rule mode, set UnityGlobal to a tested-good node, point UnityHub, UnityEditor, and UnityDownload to UnityGlobal unless you need an override, keep UnityChina on REJECT, and enable TUN when Unity does not reliably honor the system proxy.")
   return @($lines)
 }
 
@@ -392,7 +392,9 @@ $clashConfig = Get-ClashConfig
 $clashProxies = Get-ClashProxies
 $proxyState = Get-SystemProxyState
 
+$unityGlobalNow = if ($clashProxies.PSObject.Properties.Name -contains "UnityGlobal") { $clashProxies.UnityGlobal.now } else { $null }
 $unityHubNow = $clashProxies.UnityHub.now
+$unityEditorNow = if ($clashProxies.PSObject.Properties.Name -contains "UnityEditor") { $clashProxies.UnityEditor.now } else { $null }
 $unityDownloadNow = $clashProxies.UnityDownload.now
 $unityChinaNow = $clashProxies.UnityChina.now
 
@@ -408,7 +410,13 @@ Write-Host "Mixed Port: $($clashConfig.'mixed-port')"
 Write-Host "System Proxy Enabled: $($proxyState.ProxyEnabled)"
 Write-Host "System Proxy Server: $($proxyState.ProxyServer)"
 Write-Host "WinHTTP Proxy: $($proxyState.WinHttpProxy)"
+if ($unityGlobalNow) {
+  Write-Host "UnityGlobal: $unityGlobalNow"
+}
 Write-Host "UnityHub: $unityHubNow"
+if ($unityEditorNow) {
+  Write-Host "UnityEditor: $unityEditorNow"
+}
 Write-Host "UnityDownload: $unityDownloadNow"
 Write-Host "UnityChina: $unityChinaNow"
 Write-Host ""

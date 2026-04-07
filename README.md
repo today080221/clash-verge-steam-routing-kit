@@ -11,9 +11,11 @@
 
 本仓库的代码、结构和文档通过 AI 辅助生成与迭代完成。请在自己的环境中使用前先自行审阅脚本。
 
-它会向任意 Clash Verge Rev 订阅注入 6 个可复用分组：
+它会向任意 Clash Verge Rev 订阅注入 8 个可复用分组：
 
+- `UnityGlobal`：Unity 全球主分组，用来收敛 `UnityHub`、`UnityEditor`、`UnityDownload` 的默认出口
 - `UnityHub`：Unity 全球控制面，负责登录、许可、版本清单、配置与服务网关
+- `UnityEditor`：Unity Editor 相关 API、包管理、Asset Store、分析与辅助云服务
 - `UnityDownload`：Unity 全球下载面，负责 Editor、模块与包下载链路
 - `UnityChina`：Unity 中国链路隔离组，负责 `unity.cn`、`unitychina.cn`、`u3d.cn` 等中国专用域名
 - `SteamCommunity`：Steam 社区、聊天、头像，以及其他常见被拦截的 Steam Web 内容
@@ -27,6 +29,7 @@
 - 自动把新接入的远程订阅重新绑定到共享 `Script.js`
 - 把 Steam 社区、商店/登录、下载流量拆开分别调控
 - 把 Unity 全球控制面、全球下载面、Unity 中国链路拆开分别调控
+- 让所有 Unity 全球相关分组都可以默认指向同一个 `UnityGlobal`，需要时再单独覆盖
 
 ## 为什么要单独拆 UnityChina
 
@@ -34,8 +37,10 @@ Unity 官方面向全球的 Hub 与下载链路主要在 `unity.com`、`unity3d.
 
 这意味着如果你的目标是“从地区识别到 CDN 分配都尽量避开 Unity 中国”，只把 `download.unitychina.cn` 代理掉还不够，必须把整类中国专用域名单独剥出来。当前版本的默认策略就是：
 
-- `UnityHub`：走代理，负责把地区识别和服务上下文留在全球链路
-- `UnityDownload`：走代理，负责把 Editor 和模块下载留在全球链路
+- `UnityGlobal`：走代理，作为 Unity 全球链路的统一上游组
+- `UnityHub`：默认指向 `UnityGlobal`，负责把地区识别和服务上下文留在全球链路
+- `UnityEditor`：默认指向 `UnityGlobal`，负责 Unity Editor 相关 API、包管理、Asset Store、分析与辅助云服务
+- `UnityDownload`：默认指向 `UnityGlobal`，负责把 Editor 和模块下载留在全球链路
 - `UnityChina`：默认 `REJECT`，直接拦掉 Unity 中国专用域名，避免 Hub 回落到中国链路
 
 ## 在另一台 Windows 电脑上安装
@@ -62,8 +67,10 @@ install-steam-routing.bat
 
 ## 推荐默认设置
 
-- `UnityHub`：`自动选择`，或手动指定一个稳定的海外节点
-- `UnityDownload`：和 `UnityHub` 使用同一个稳定海外节点，避免 Editor/模块下载又被分回中国链路
+- `UnityGlobal`：`自动选择`，或手动指定一个稳定的海外节点
+- `UnityHub`：默认指向 `UnityGlobal`
+- `UnityEditor`：默认指向 `UnityGlobal`
+- `UnityDownload`：默认指向 `UnityGlobal`
 - `UnityChina`：`REJECT`
 - `SteamCommunity`：`自动选择`，或手动指定香港/日本节点
 - `SteamMainland`：`DIRECT`
@@ -71,12 +78,14 @@ install-steam-routing.bat
 
 如果 Unity Hub 仍然出现 `Validation Failed`：
 
-- 先确认 `UnityHub` 与 `UnityDownload` 不是 `DIRECT`
-- 尽量让 `UnityHub` 与 `UnityDownload` 使用同一个稳定海外节点
+- 先确认 `UnityGlobal`、`UnityHub`、`UnityEditor`、`UnityDownload` 都不是 `DIRECT`
+- 默认先把 `UnityHub`、`UnityEditor`、`UnityDownload` 都指向 `UnityGlobal`
+- 如果需要单独覆盖，再只调整某一个 Unity 细分组
 - 先运行 `test-unity-routing.bat` 做对照验证
 - 如果脚本显示“直连链路是 `302 -> download.unitychina.cn -> 404`，但 Clash 代理链路是 `200`”，说明 Unity 请求没有稳定进 Clash，优先改成 `规则模式 + 开启 TUN`
 - 如果脚本显示“Clash 代理链路本身仍然是 `302` 或 `404`”，说明当前节点虽然在海外，但 Unity 还是被分配到了中国镜像，直接换 `UnityHub`/`UnityDownload` 节点并重测
 - 如果某个节点能通过 `200/206` 检查，但大文件中途 `ECONNRESET`，继续用脚本对比其他节点；不要只看地区名，先看真实 Unity 链路结果
+- 如果你在活动连接里看到 `unity-connect-prd.storage.googleapis.com`、`config.uca.cloud.unity3d.com`、`api.hub-proxy.unity3d.com` 之类的请求，它们现在会分别落到 `UnityEditor` 或 `UnityHub`，不再被泛化的 `google` 规则抢走
 
 如果 Steam 商店出现 `-100` 错误，可以临时把 `SteamMainland` 从 `DIRECT` 改成和 `SteamCommunity` 相同的节点再测试。
 

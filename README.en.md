@@ -11,9 +11,11 @@ This repository is an AI-generated project.
 
 The code, structure, and documentation were produced through AI-assisted generation and iteration. Please review the scripts before using them in your own environment.
 
-It injects six reusable groups into any Clash Verge Rev subscription:
+It injects eight reusable groups into any Clash Verge Rev subscription:
 
+- `UnityGlobal`: Unity global parent selector that lets `UnityHub`, `UnityEditor`, and `UnityDownload` converge on the same upstream node
 - `UnityHub`: Unity global control-plane traffic for sign-in, licensing, release metadata, config, and service gateways
+- `UnityEditor`: Unity Editor APIs, package-manager traffic, Asset Store traffic, analytics, and auxiliary cloud services
 - `UnityDownload`: Unity global download-plane traffic for editor, modules, and package delivery
 - `UnityChina`: an isolation group for China-specific Unity domains such as `unity.cn`, `unitychina.cn`, and `u3d.cn`
 - `SteamCommunity`: Steam community, chat, avatars, and other commonly blocked Steam web content
@@ -27,6 +29,7 @@ It injects six reusable groups into any Clash Verge Rev subscription:
 - Rebinds newly added remote subscriptions to the shared `Script.js`
 - Separates Steam community, store/login, and download traffic so they can be tuned independently
 - Separates Unity global control, Unity global download, and Unity China traffic so they can be tuned independently
+- Lets all global Unity groups point to the same `UnityGlobal` selector by default while still allowing per-group overrides
 
 ## Why `UnityChina` Exists
 
@@ -34,8 +37,10 @@ Unity's global Hub flow mostly lives on `unity.com`, `unity3d.com`, `public-cdn.
 
 That means "proxy `download.unitychina.cn`" alone is not enough if your goal is to stay off the Unity China path from geo/context detection through CDN assignment. The current default model is:
 
-- `UnityHub`: proxy, to keep region/context and service metadata on the global path
-- `UnityDownload`: proxy, to keep editor and module downloads on the global path
+- `UnityGlobal`: proxy, as the shared upstream selector for the global Unity path
+- `UnityHub`: defaults to `UnityGlobal`, to keep region/context and service metadata on the global path
+- `UnityEditor`: defaults to `UnityGlobal`, for Unity Editor APIs, package-manager traffic, Asset Store traffic, analytics, and auxiliary cloud services
+- `UnityDownload`: defaults to `UnityGlobal`, to keep editor and module downloads on the global path
 - `UnityChina`: `REJECT` by default, to block dedicated Unity China domains instead of silently falling back to them
 
 ## Install on Another Windows PC
@@ -62,8 +67,10 @@ You only need to download the package once. After that, keep using the same `ins
 
 ## Recommended Defaults
 
-- `UnityHub`: `Auto Select`, or a stable overseas node
-- `UnityDownload`: use the same stable overseas node as `UnityHub`
+- `UnityGlobal`: `Auto Select`, or a stable overseas node
+- `UnityHub`: point it to `UnityGlobal`
+- `UnityEditor`: point it to `UnityGlobal`
+- `UnityDownload`: point it to `UnityGlobal`
 - `UnityChina`: `REJECT`
 - `SteamCommunity`: `Auto Select`, or a Hong Kong/Japan node
 - `SteamMainland`: `DIRECT`
@@ -71,12 +78,14 @@ You only need to download the package once. After that, keep using the same `ins
 
 If Unity Hub still shows `Validation Failed`:
 
-- make sure `UnityHub` and `UnityDownload` are not `DIRECT`
-- prefer using the same stable overseas node for both
+- make sure `UnityGlobal`, `UnityHub`, `UnityEditor`, and `UnityDownload` are not `DIRECT`
+- point `UnityHub`, `UnityEditor`, and `UnityDownload` to `UnityGlobal` first
+- only override a specific Unity sub-group when you have a confirmed reason
 - run `test-unity-routing.bat` first
 - if the script shows `302 -> download.unitychina.cn -> 404` on the direct path but `200` on the Clash proxy path, Unity is not entering Clash reliably enough; prefer `Rule mode + TUN enabled`
 - if the Clash proxy path itself still returns `302` or `404`, that node is still being sent to the Unity China mirror even though it is an overseas node; switch `UnityHub` and `UnityDownload` together and test again
 - if a node passes the `200/206` checks but large downloads still hit `ECONNRESET`, compare more nodes with the script instead of trusting the region label alone
+- if you see requests such as `unity-connect-prd.storage.googleapis.com`, `config.uca.cloud.unity3d.com`, or `api.hub-proxy.unity3d.com` in Clash activity, they now land on `UnityEditor` or `UnityHub` instead of a generic `google` rule
 
 If the Steam store shows `-100`, temporarily change `SteamMainland` from `DIRECT` to the same node as `SteamCommunity` and test again.
 

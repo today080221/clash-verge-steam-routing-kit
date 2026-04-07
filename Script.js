@@ -1,3 +1,14 @@
+const MANAGED_GROUP_NAMES = [
+  "UnityGlobal",
+  "UnityHub",
+  "UnityEditor",
+  "UnityDownload",
+  "UnityChina",
+  "SteamCommunity",
+  "SteamMainland",
+  "SteamDownload",
+];
+
 function unique(items) {
   const seen = new Set();
   const result = [];
@@ -14,15 +25,7 @@ function unique(items) {
 function pickGroupNames(groups, preferred) {
   const names = groups
     .map((group) => group && group.name)
-    .filter((name) =>
-      name &&
-      name !== "UnityChina" &&
-      name !== "UnityDownload" &&
-      name !== "UnityHub" &&
-      name !== "SteamCommunity" &&
-      name !== "SteamMainland" &&
-      name !== "SteamDownload"
-    );
+    .filter((name) => name && !MANAGED_GROUP_NAMES.includes(name));
 
   const preferredNames = preferred.filter((name) => names.includes(name));
   const restNames = names.filter((name) => !preferred.includes(name));
@@ -59,14 +62,38 @@ function main(config) {
   const proxies = Array.isArray(nextConfig.proxies) ? nextConfig.proxies : [];
 
   const preferredGroups = pickGroupNames(proxyGroups, [
-    "自动选择",
-    "♻️ 自动选择",
+    "\u81ea\u52a8\u9009\u62e9",
+    "\u2611\ufe0f \u81ea\u52a8\u9009\u62e9",
     "Auto Select",
-    "故障转移",
+    "\u6545\u969c\u8f6c\u79fb",
     "Fallback",
   ]);
   const proxyNames = pickProxyNames(proxies);
 
+  const unityGlobalChoices = unique([
+    ...preferredGroups,
+    ...proxyNames,
+    "DIRECT",
+  ]);
+  const unityHubChoices = unique([
+    "UnityGlobal",
+    ...unityGlobalChoices,
+  ]);
+  const unityEditorChoices = unique([
+    "UnityGlobal",
+    ...unityGlobalChoices,
+  ]);
+  const unityDownloadChoices = unique([
+    "UnityGlobal",
+    ...unityGlobalChoices,
+  ]);
+  const unityChinaChoices = unique([
+    "REJECT",
+    "UnityGlobal",
+    "DIRECT",
+    ...preferredGroups,
+    ...proxyNames,
+  ]);
   const steamCommunityChoices = unique([
     ...preferredGroups,
     ...proxyNames,
@@ -82,22 +109,6 @@ function main(config) {
     ...preferredGroups,
     ...proxyNames,
   ]);
-  const unityChinaChoices = unique([
-    "REJECT",
-    "DIRECT",
-    ...preferredGroups,
-    ...proxyNames,
-  ]);
-  const unityDownloadChoices = unique([
-    ...preferredGroups,
-    ...proxyNames,
-    "DIRECT",
-  ]);
-  const unityHubChoices = unique([
-    ...preferredGroups,
-    ...proxyNames,
-    "DIRECT",
-  ]);
 
   let nextGroups = proxyGroups;
   nextGroups = upsertSelectGroup(nextGroups, "SteamDownload", steamDownloadChoices);
@@ -105,18 +116,34 @@ function main(config) {
   nextGroups = upsertSelectGroup(nextGroups, "SteamCommunity", steamCommunityChoices);
   nextGroups = upsertSelectGroup(nextGroups, "UnityChina", unityChinaChoices);
   nextGroups = upsertSelectGroup(nextGroups, "UnityDownload", unityDownloadChoices);
+  nextGroups = upsertSelectGroup(nextGroups, "UnityEditor", unityEditorChoices);
   nextGroups = upsertSelectGroup(nextGroups, "UnityHub", unityHubChoices);
+  nextGroups = upsertSelectGroup(nextGroups, "UnityGlobal", unityGlobalChoices);
   nextConfig["proxy-groups"] = nextGroups;
 
-  const unityHubRules = [
+  const unityRules = [
     "DOMAIN-SUFFIX,unitychina.cn,UnityChina",
     "DOMAIN-SUFFIX,unity.cn,UnityChina",
     "DOMAIN-SUFFIX,u3d.cn,UnityChina",
     "DOMAIN,download.unity3d.com,UnityDownload",
     "DOMAIN,beta.unity3d.com,UnityDownload",
-    "DOMAIN,cdn.packages.unity.com,UnityDownload",
-    "DOMAIN,download.packages.unity.com,UnityDownload",
-    "DOMAIN,private.download.packages.unity.com,UnityDownload",
+    "DOMAIN,dl.google.com,UnityDownload",
+    "DOMAIN,go.microsoft.com,UnityDownload",
+    "DOMAIN,unity-connect-prd.storage.googleapis.com,UnityEditor",
+    "DOMAIN,cdn.packages.unity.com,UnityEditor",
+    "DOMAIN,download.packages.unity.com,UnityEditor",
+    "DOMAIN,private.download.packages.unity.com,UnityEditor",
+    "DOMAIN,packages.unity.com,UnityEditor",
+    "DOMAIN,packages-v2.unity.com,UnityEditor",
+    "DOMAIN,assetstore.unity.com,UnityEditor",
+    "DOMAIN,kharma.unity3d.com,UnityEditor",
+    "DOMAIN,config.uca.cloud.unity3d.com,UnityEditor",
+    "DOMAIN,analytics.cloud.unity3d.com,UnityEditor",
+    "DOMAIN,cdp.cloud.unity3d.com,UnityEditor",
+    "DOMAIN,developer.cloud.unity3d.com,UnityEditor",
+    "DOMAIN,perf.cloud.unity3d.com,UnityEditor",
+    "DOMAIN,perf-events.cloud.unity3d.com,UnityEditor",
+    "DOMAIN,api2.amplitude.com,UnityEditor",
     "DOMAIN,services.unity.com,UnityHub",
     "DOMAIN,api.unity.com,UnityHub",
     "DOMAIN,id.unity.com,UnityHub",
@@ -124,12 +151,13 @@ function main(config) {
     "DOMAIN,accounts.unity3d.com,UnityHub",
     "DOMAIN,license.unity3d.com,UnityHub",
     "DOMAIN,activation.unity3d.com,UnityHub",
-    "DOMAIN,assetstore.unity.com,UnityHub",
-    "DOMAIN,packages.unity.com,UnityHub",
-    "DOMAIN,packages-v2.unity.com,UnityHub",
     "DOMAIN,public-cdn.cloud.unity3d.com,UnityHub",
     "DOMAIN,core.cloud.unity3d.com,UnityHub",
     "DOMAIN,live-platform-api.prd.ld.unity3d.com,UnityHub",
+    "DOMAIN,api.hub-proxy.unity3d.com,UnityHub",
+    "DOMAIN,core.hub-proxy.unity3d.com,UnityHub",
+    "DOMAIN,config.hub-proxy.unity3d.com,UnityHub",
+    "DOMAIN,learn.unity.com,UnityHub",
     "DOMAIN-SUFFIX,hub-proxy.unity3d.com,UnityHub",
     "DOMAIN-SUFFIX,unity.com,UnityHub",
     "DOMAIN-SUFFIX,unity3d.com,UnityHub",
@@ -164,6 +192,6 @@ function main(config) {
     "DOMAIN-SUFFIX,cdn.cloudflare.steamstatic.com,SteamMainland",
   ];
 
-  prependRules(nextConfig, [...unityHubRules, ...steamRules]);
+  prependRules(nextConfig, [...unityRules, ...steamRules]);
   return nextConfig;
 }
