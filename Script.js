@@ -1,5 +1,6 @@
 const MANAGED_GROUP_NAMES = [
   "UnityGlobal",
+  "UnityWeb",
   "UnityHub",
   "UnityEditor",
   "UnityDownload",
@@ -79,6 +80,10 @@ function main(config) {
     "UnityGlobal",
     ...unityGlobalChoices,
   ]);
+  const unityWebChoices = unique([
+    "UnityGlobal",
+    ...unityGlobalChoices,
+  ]);
   const unityEditorChoices = unique([
     "UnityGlobal",
     ...unityGlobalChoices,
@@ -117,6 +122,7 @@ function main(config) {
   nextGroups = upsertSelectGroup(nextGroups, "UnityChina", unityChinaChoices);
   nextGroups = upsertSelectGroup(nextGroups, "UnityDownload", unityDownloadChoices);
   nextGroups = upsertSelectGroup(nextGroups, "UnityEditor", unityEditorChoices);
+  nextGroups = upsertSelectGroup(nextGroups, "UnityWeb", unityWebChoices);
   nextGroups = upsertSelectGroup(nextGroups, "UnityHub", unityHubChoices);
   nextGroups = upsertSelectGroup(nextGroups, "UnityGlobal", unityGlobalChoices);
   nextConfig["proxy-groups"] = nextGroups;
@@ -130,13 +136,13 @@ function main(config) {
     "DOMAIN,dl.google.com,UnityDownload",
     "DOMAIN,go.microsoft.com,UnityDownload",
     "DOMAIN,unity-connect-prd.storage.googleapis.com,UnityEditor",
+    "DOMAIN,storage.googleapis.com,UnityEditor",
+    "DOMAIN,upm-cdn.unity.com,UnityEditor",
     "DOMAIN,cdn.packages.unity.com,UnityEditor",
     "DOMAIN,download.packages.unity.com,UnityEditor",
     "DOMAIN,private.download.packages.unity.com,UnityEditor",
     "DOMAIN,packages.unity.com,UnityEditor",
     "DOMAIN,packages-v2.unity.com,UnityEditor",
-    "DOMAIN,assetstore.unity.com,UnityEditor",
-    "DOMAIN,kharma.unity3d.com,UnityEditor",
     "DOMAIN,config.uca.cloud.unity3d.com,UnityEditor",
     "DOMAIN,analytics.cloud.unity3d.com,UnityEditor",
     "DOMAIN,cdp.cloud.unity3d.com,UnityEditor",
@@ -144,11 +150,14 @@ function main(config) {
     "DOMAIN,perf.cloud.unity3d.com,UnityEditor",
     "DOMAIN,perf-events.cloud.unity3d.com,UnityEditor",
     "DOMAIN,api2.amplitude.com,UnityEditor",
+    "DOMAIN,assetstore.unity.com,UnityWeb",
+    "DOMAIN,kharma.unity3d.com,UnityWeb",
+    "DOMAIN,unity-assetstorev2-prd.storage.googleapis.com,UnityWeb",
+    "DOMAIN,id.unity.com,UnityWeb",
+    "DOMAIN,api.unity.com,UnityWeb",
+    "DOMAIN,login.unity.com,UnityWeb",
+    "DOMAIN,accounts.unity3d.com,UnityWeb",
     "DOMAIN,services.unity.com,UnityHub",
-    "DOMAIN,api.unity.com,UnityHub",
-    "DOMAIN,id.unity.com,UnityHub",
-    "DOMAIN,login.unity.com,UnityHub",
-    "DOMAIN,accounts.unity3d.com,UnityHub",
     "DOMAIN,license.unity3d.com,UnityHub",
     "DOMAIN,activation.unity3d.com,UnityHub",
     "DOMAIN,public-cdn.cloud.unity3d.com,UnityHub",

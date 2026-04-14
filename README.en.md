@@ -11,11 +11,12 @@ This repository is an AI-generated project.
 
 The code, structure, and documentation were produced through AI-assisted generation and iteration. Please review the scripts before using them in your own environment.
 
-It injects eight reusable groups into any Clash Verge Rev subscription:
+It injects nine reusable groups into any Clash Verge Rev subscription:
 
 - `UnityGlobal`: Unity global parent selector that lets `UnityHub`, `UnityEditor`, and `UnityDownload` converge on the same upstream node
+- `UnityWeb`: Unity web and account traffic for browser-side Unity ID, Asset Store, and related web APIs
 - `UnityHub`: Unity global control-plane traffic for sign-in, licensing, release metadata, config, and service gateways
-- `UnityEditor`: Unity Editor APIs, package-manager traffic, Asset Store traffic, analytics, and auxiliary cloud services
+- `UnityEditor`: Unity Editor APIs, package-manager traffic, analytics, and auxiliary cloud services
 - `UnityDownload`: Unity global download-plane traffic for editor, modules, and package delivery
 - `UnityChina`: an isolation group for China-specific Unity domains such as `unity.cn`, `unitychina.cn`, and `u3d.cn`
 - `SteamCommunity`: Steam community, chat, avatars, and other commonly blocked Steam web content
@@ -30,6 +31,7 @@ It injects eight reusable groups into any Clash Verge Rev subscription:
 - Separates Steam community, store/login, and download traffic so they can be tuned independently
 - Separates Unity global control, Unity global download, and Unity China traffic so they can be tuned independently
 - Lets all global Unity groups point to the same `UnityGlobal` selector by default while still allowing per-group overrides
+- Separates browser-side Unity ID and Asset Store traffic from Unity Hub and Unity Editor traffic
 
 ## Why `UnityChina` Exists
 
@@ -38,8 +40,9 @@ Unity's global Hub flow mostly lives on `unity.com`, `unity3d.com`, `public-cdn.
 That means "proxy `download.unitychina.cn`" alone is not enough if your goal is to stay off the Unity China path from geo/context detection through CDN assignment. The current default model is:
 
 - `UnityGlobal`: proxy, as the shared upstream selector for the global Unity path
+- `UnityWeb`: defaults to `UnityGlobal`, for browser-side Unity ID, Asset Store, and related web APIs
 - `UnityHub`: defaults to `UnityGlobal`, to keep region/context and service metadata on the global path
-- `UnityEditor`: defaults to `UnityGlobal`, for Unity Editor APIs, package-manager traffic, Asset Store traffic, analytics, and auxiliary cloud services
+- `UnityEditor`: defaults to `UnityGlobal`, for Unity Editor APIs, package-manager traffic, analytics, and auxiliary cloud services
 - `UnityDownload`: defaults to `UnityGlobal`, to keep editor and module downloads on the global path
 - `UnityChina`: `REJECT` by default, to block dedicated Unity China domains instead of silently falling back to them
 
@@ -68,6 +71,7 @@ You only need to download the package once. After that, keep using the same `ins
 ## Recommended Defaults
 
 - `UnityGlobal`: `Auto Select`, or a stable overseas node
+- `UnityWeb`: point it to `UnityGlobal`
 - `UnityHub`: point it to `UnityGlobal`
 - `UnityEditor`: point it to `UnityGlobal`
 - `UnityDownload`: point it to `UnityGlobal`
@@ -85,7 +89,12 @@ If Unity Hub still shows `Validation Failed`:
 - if the script shows `302 -> download.unitychina.cn -> 404` on the direct path but `200` on the Clash proxy path, Unity is not entering Clash reliably enough; prefer `Rule mode + TUN enabled`
 - if the Clash proxy path itself still returns `302` or `404`, that node is still being sent to the Unity China mirror even though it is an overseas node; switch `UnityHub` and `UnityDownload` together and test again
 - if a node passes the `200/206` checks but large downloads still hit `ECONNRESET`, compare more nodes with the script instead of trusting the region label alone
-- if you see requests such as `unity-connect-prd.storage.googleapis.com`, `config.uca.cloud.unity3d.com`, or `api.hub-proxy.unity3d.com` in Clash activity, they now land on `UnityEditor` or `UnityHub` instead of a generic `google` rule
+- if you see requests such as `unity-connect-prd.storage.googleapis.com`, `config.uca.cloud.unity3d.com`, `api.hub-proxy.unity3d.com`, or `unity-assetstorev2-prd.storage.googleapis.com` in Clash activity, they now land on `UnityEditor`, `UnityHub`, or `UnityWeb` instead of a generic `google` rule
+- if Unity Package Manager can list packages but stalls on `.tgz` downloads, make sure `UnityEditor` is not pinned to a different node and point it back to `UnityGlobal` with `UnityHub` and `UnityDownload`
+- when proxying Unity, it is usually best to also use Proxifier or a similar tool to reroute `Unity Hub.exe`, `Unity.exe`, and `UnityPackageManager.exe` into the local Clash Verge Rev proxy, for example `127.0.0.1:7897`
+- the rules now also cover `storage.googleapis.com` and the legacy `upm-cdn.unity.com` host so Unity package tarballs and older CDN paths stay inside the Unity-specific route
+- browser-side `assetstore.unity.com`, `kharma.unity3d.com`, `unity-assetstorev2-prd.storage.googleapis.com`, `id.unity.com`, `login.unity.com`, and `accounts.unity3d.com` now go through `UnityWeb`
+- if UPM still bypasses Clash intermittently, follow Unity's proxy guidance and launch Unity Hub or the Editor with `HTTP_PROXY` and `HTTPS_PROXY`
 
 If the Steam store shows `-100`, temporarily change `SteamMainland` from `DIRECT` to the same node as `SteamCommunity` and test again.
 
@@ -107,7 +116,7 @@ It compares the current direct path and the current Clash proxy path. After swit
 - `sync-clash-verge-steam-script.ps1`: background watcher that rebinds remote subscriptions to `Script.js`
 - `Start ClashVerge Steam Sync.vbs`: startup entry that launches the watcher hidden
 - `test-unity-routing.bat`: one-click entrypoint for Unity 404/302/reset diagnosis
-- `test-unity-routing.ps1`: Unity diagnostic script that compares direct vs proxied requests
+- `test-unity-routing.ps1`: Unity diagnostic script that compares direct vs proxied requests and also checks a Package Manager tarball path
 - `VERSION`: local package version used by the auto-update comparison
 - `Merge.yaml`: placeholder to satisfy the global merge card
 

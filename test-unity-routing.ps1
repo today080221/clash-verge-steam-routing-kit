@@ -3,6 +3,8 @@ param(
 
   [string]$ModuleUrl = "https://download.unity3d.com/download_unity/8535861f39e1/TargetSupportInstaller/UnitySetup-Windows-IL2CPP-Support-for-Editor-6000.4.1f1.exe",
 
+  [string]$PackageTarballUrl = "https://download.packages.unity.com/com.unity.burst/-/com.unity.burst-1.8.29.tgz",
+
   [long]$RangeBytes = 67108864,
 
   [switch]$SkipRangeTest
@@ -364,7 +366,13 @@ function Get-DiagnosisLines {
       $lines.Add("$($result.Label): direct path ends at Unity China and returns 404. This is the exact failure signature behind the Unity Hub 404 case.")
     }
 
-    if ($result.ProxyHead.FinalStatus -match "200 OK") {
+    $looksLikePackageCdnRedirect = (
+      $result.ProxyHead.FinalStatus -match "302" -and
+      -not $result.ProxyHead.RedirectsToChina -and
+      @($result.ProxyHead.Locations | Where-Object { $_ -match "cdn\.packages\.unity\.com|storage\.googleapis\.com" }).Count -gt 0
+    )
+
+    if ($result.ProxyHead.FinalStatus -match "200 OK" -or $looksLikePackageCdnRedirect) {
       $lines.Add("$($result.Label): Clash proxy path is healthy for the current Unity node selection.")
     }
     elseif ($result.ProxyHead.RedirectsToChina -or $result.ProxyHead.FinalStatus -match "302") {
@@ -394,6 +402,7 @@ $proxyState = Get-SystemProxyState
 
 $unityGlobalNow = if ($clashProxies.PSObject.Properties.Name -contains "UnityGlobal") { $clashProxies.UnityGlobal.now } else { $null }
 $unityHubNow = $clashProxies.UnityHub.now
+$unityWebNow = if ($clashProxies.PSObject.Properties.Name -contains "UnityWeb") { $clashProxies.UnityWeb.now } else { $null }
 $unityEditorNow = if ($clashProxies.PSObject.Properties.Name -contains "UnityEditor") { $clashProxies.UnityEditor.now } else { $null }
 $unityDownloadNow = $clashProxies.UnityDownload.now
 $unityChinaNow = $clashProxies.UnityChina.now
@@ -401,6 +410,7 @@ $unityChinaNow = $clashProxies.UnityChina.now
 $urlResults = @(
   Test-UnityUrl -Label "Editor" -Url $EditorUrl
   Test-UnityUrl -Label "IL2CPP Module" -Url $ModuleUrl
+  Test-UnityUrl -Label "UPM Package Tarball" -Url $PackageTarballUrl
 )
 
 Write-Host "== Clash state =="
@@ -414,6 +424,9 @@ if ($unityGlobalNow) {
   Write-Host "UnityGlobal: $unityGlobalNow"
 }
 Write-Host "UnityHub: $unityHubNow"
+if ($unityWebNow) {
+  Write-Host "UnityWeb: $unityWebNow"
+}
 if ($unityEditorNow) {
   Write-Host "UnityEditor: $unityEditorNow"
 }

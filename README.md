@@ -11,11 +11,12 @@
 
 本仓库的代码、结构和文档通过 AI 辅助生成与迭代完成。请在自己的环境中使用前先自行审阅脚本。
 
-它会向任意 Clash Verge Rev 订阅注入 8 个可复用分组：
+它会向任意 Clash Verge Rev 订阅注入 9 个可复用分组：
 
 - `UnityGlobal`：Unity 全球主分组，用来收敛 `UnityHub`、`UnityEditor`、`UnityDownload` 的默认出口
+- `UnityWeb`：Unity 网页与账号分组，负责浏览器里的 Unity ID、Asset Store 和相关 Web API
 - `UnityHub`：Unity 全球控制面，负责登录、许可、版本清单、配置与服务网关
-- `UnityEditor`：Unity Editor 相关 API、包管理、Asset Store、分析与辅助云服务
+- `UnityEditor`：Unity Editor 相关 API、包管理、分析与辅助云服务
 - `UnityDownload`：Unity 全球下载面，负责 Editor、模块与包下载链路
 - `UnityChina`：Unity 中国链路隔离组，负责 `unity.cn`、`unitychina.cn`、`u3d.cn` 等中国专用域名
 - `SteamCommunity`：Steam 社区、聊天、头像，以及其他常见被拦截的 Steam Web 内容
@@ -30,6 +31,7 @@
 - 把 Steam 社区、商店/登录、下载流量拆开分别调控
 - 把 Unity 全球控制面、全球下载面、Unity 中国链路拆开分别调控
 - 让所有 Unity 全球相关分组都可以默认指向同一个 `UnityGlobal`，需要时再单独覆盖
+- 把浏览器里的 Unity ID、Asset Store 和 Unity Hub / Editor 链路拆开分别调控
 
 ## 为什么要单独拆 UnityChina
 
@@ -38,8 +40,9 @@ Unity 官方面向全球的 Hub 与下载链路主要在 `unity.com`、`unity3d.
 这意味着如果你的目标是“从地区识别到 CDN 分配都尽量避开 Unity 中国”，只把 `download.unitychina.cn` 代理掉还不够，必须把整类中国专用域名单独剥出来。当前版本的默认策略就是：
 
 - `UnityGlobal`：走代理，作为 Unity 全球链路的统一上游组
+- `UnityWeb`：默认指向 `UnityGlobal`，负责浏览器里的 Unity ID、Asset Store 与相关 Web API
 - `UnityHub`：默认指向 `UnityGlobal`，负责把地区识别和服务上下文留在全球链路
-- `UnityEditor`：默认指向 `UnityGlobal`，负责 Unity Editor 相关 API、包管理、Asset Store、分析与辅助云服务
+- `UnityEditor`：默认指向 `UnityGlobal`，负责 Unity Editor 相关 API、包管理、分析与辅助云服务
 - `UnityDownload`：默认指向 `UnityGlobal`，负责把 Editor 和模块下载留在全球链路
 - `UnityChina`：默认 `REJECT`，直接拦掉 Unity 中国专用域名，避免 Hub 回落到中国链路
 
@@ -68,6 +71,7 @@ install-steam-routing.bat
 ## 推荐默认设置
 
 - `UnityGlobal`：`自动选择`，或手动指定一个稳定的海外节点
+- `UnityWeb`：默认指向 `UnityGlobal`
 - `UnityHub`：默认指向 `UnityGlobal`
 - `UnityEditor`：默认指向 `UnityGlobal`
 - `UnityDownload`：默认指向 `UnityGlobal`
@@ -85,7 +89,12 @@ install-steam-routing.bat
 - 如果脚本显示“直连链路是 `302 -> download.unitychina.cn -> 404`，但 Clash 代理链路是 `200`”，说明 Unity 请求没有稳定进 Clash，优先改成 `规则模式 + 开启 TUN`
 - 如果脚本显示“Clash 代理链路本身仍然是 `302` 或 `404`”，说明当前节点虽然在海外，但 Unity 还是被分配到了中国镜像，直接换 `UnityHub`/`UnityDownload` 节点并重测
 - 如果某个节点能通过 `200/206` 检查，但大文件中途 `ECONNRESET`，继续用脚本对比其他节点；不要只看地区名，先看真实 Unity 链路结果
-- 如果你在活动连接里看到 `unity-connect-prd.storage.googleapis.com`、`config.uca.cloud.unity3d.com`、`api.hub-proxy.unity3d.com` 之类的请求，它们现在会分别落到 `UnityEditor` 或 `UnityHub`，不再被泛化的 `google` 规则抢走
+- 如果你在活动连接里看到 `unity-connect-prd.storage.googleapis.com`、`config.uca.cloud.unity3d.com`、`api.hub-proxy.unity3d.com`、`unity-assetstorev2-prd.storage.googleapis.com` 之类的请求，它们现在会分别落到 `UnityEditor`、`UnityHub` 或 `UnityWeb`，不再被泛化的 `google` 规则抢走
+- 如果 Unity Package Manager 能看到包列表，但下载 `.tgz` 包体经常卡住，先确认 `UnityEditor` 没有单独绑到别的节点，优先和 `UnityHub`、`UnityDownload` 一起指向 `UnityGlobal`
+- 给 Unity 做代理时，最好额外用 Proxifier 之类的工具把 `Unity Hub.exe`、`Unity.exe` 和 `UnityPackageManager.exe` 强制 reroute 到 Clash Verge Rev 的本地代理，例如 `127.0.0.1:7897`
+- 当前规则额外覆盖了 `storage.googleapis.com` 与兼容旧版 `upm-cdn.unity.com`，用来接住 Unity 官方文档里提到的 UPM 签名包文件与旧 CDN 域名
+- 浏览器里的 `assetstore.unity.com`、`kharma.unity3d.com`、`unity-assetstorev2-prd.storage.googleapis.com`、`id.unity.com`、`login.unity.com` 和 `accounts.unity3d.com` 现在会单独走 `UnityWeb`
+- 如果 UPM 仍然偶发不走 Clash，可按 Unity 官方代理文档给启动 Unity Hub / Editor 的进程注入 `HTTP_PROXY` 和 `HTTPS_PROXY`
 
 如果 Steam 商店出现 `-100` 错误，可以临时把 `SteamMainland` 从 `DIRECT` 改成和 `SteamCommunity` 相同的节点再测试。
 
@@ -107,7 +116,7 @@ test-unity-routing.bat
 - `sync-clash-verge-steam-script.ps1`：后台监听脚本，会把远程订阅重新绑定到 `Script.js`
 - `Start ClashVerge Steam Sync.vbs`：开机启动入口，用于隐藏启动监听脚本
 - `test-unity-routing.bat`：Unity 下载 404/302/掉线的一键排查入口
-- `test-unity-routing.ps1`：Unity 诊断脚本，可对比直连/代理结果
+- `test-unity-routing.ps1`：Unity 诊断脚本，可对比直连/代理结果，并额外测试 Package Manager tarball 链路
 - `VERSION`：当前本地包版本号，供自动更新逻辑比较使用
 - `Merge.yaml`：用于兼容全局 Merge 卡片的占位文件
 
