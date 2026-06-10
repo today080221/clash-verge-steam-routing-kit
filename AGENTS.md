@@ -10,6 +10,7 @@ It provides a shared routing layer that:
 
 - splits Unity traffic into `UnityGlobal`, `UnityWeb`, `UnityHub`, `UnityEditor`, `UnityDownload`, and `UnityChina`
 - splits Steam traffic into `SteamCommunity`, `SteamMainland`, and `SteamDownload`
+- optionally splits Bilibili web-player CDN traffic into `BilibiliVideo`
 - keeps the same routing logic reusable across different providers
 - supports multi-PC installation through local scripts and release assets
 
@@ -26,6 +27,7 @@ Treat the following group names as stable public interface unless the user expli
 - `SteamCommunity`
 - `SteamMainland`
 - `SteamDownload`
+- `BilibiliVideo`
 
 The intended defaults are:
 
@@ -38,6 +40,7 @@ The intended defaults are:
 - `SteamCommunity`: proxy or auto-select
 - `SteamMainland`: `DIRECT` first
 - `SteamDownload`: `DIRECT`
+- `BilibiliVideo`: `DIRECT` first, with proxy choices available for 6003/CDN troubleshooting
 
 If a change affects these group names or their purpose, update the documentation and release notes together.
 

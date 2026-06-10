@@ -11,7 +11,7 @@ This repository is an AI-generated project.
 
 The code, structure, and documentation were produced through AI-assisted generation and iteration. Please review the scripts before using them in your own environment.
 
-It injects nine reusable groups into any Clash Verge Rev subscription:
+It injects ten reusable groups into any Clash Verge Rev subscription:
 
 - `UnityGlobal`: Unity global parent selector that lets `UnityHub`, `UnityEditor`, and `UnityDownload` converge on the same upstream node
 - `UnityWeb`: Unity web and account traffic for browser-side Unity ID, Asset Store, and related web APIs
@@ -22,6 +22,7 @@ It injects nine reusable groups into any Clash Verge Rev subscription:
 - `SteamCommunity`: Steam community, chat, avatars, and other commonly blocked Steam web content
 - `SteamMainland`: Steam store, login, help, and general Steam web traffic that usually works from mainland China
 - `SteamDownload`: Steam CDN, content servers, and download-related traffic
+- `BilibiliVideo`: an optional Bilibili video-CDN selector for web player 6003 errors or CDN/DNS path issues
 
 ## What This Repo Solves
 
@@ -29,6 +30,7 @@ It injects nine reusable groups into any Clash Verge Rev subscription:
 - Applies the same split-routing behavior across different providers
 - Rebinds newly added remote subscriptions to the shared `Script.js`
 - Separates Steam community, store/login, and download traffic so they can be tuned independently
+- Separates Bilibili web-player CDN traffic from generic China-direct rules so only the video path needs to be switched when needed
 - Separates Unity global control, Unity global download, and Unity China traffic so they can be tuned independently
 - Lets all global Unity groups point to the same `UnityGlobal` selector by default while still allowing per-group overrides
 - Separates browser-side Unity ID and Asset Store traffic from Unity Hub and Unity Editor traffic
@@ -79,6 +81,7 @@ You only need to download the package once. After that, keep using the same `ins
 - `SteamCommunity`: `Auto Select`, or a Hong Kong/Japan node
 - `SteamMainland`: `DIRECT`
 - `SteamDownload`: `DIRECT`
+- `BilibiliVideo`: `DIRECT` by default; if the web player shows 6003 but works when system/global proxy is enabled, temporarily switch it to a stable node
 
 If Unity Hub still shows `Validation Failed`:
 
@@ -97,6 +100,13 @@ If Unity Hub still shows `Validation Failed`:
 - if UPM still bypasses Clash intermittently, follow Unity's proxy guidance and launch Unity Hub or the Editor with `HTTP_PROXY` and `HTTPS_PROXY`
 
 If the Steam store shows `-100`, temporarily change `SteamMainland` from `DIRECT` to the same node as `SteamCommunity` and test again.
+
+If the Bilibili web player shows error code `6003`:
+
+- switch `BilibiliVideo` from `DIRECT` to a known-good node or auto-select group
+- this only captures video/static CDN domains such as `bilivideo.com` and `hdslb.com`; it does not force all `bilibili.com` API traffic through a proxy
+- if playback recovers immediately, the likely cause is the direct DNS/CDN assignment or ISP path, not browser hardware decoding
+- if it still fails, clear the page cache or retry in a private window so the player does not reuse a failed connection
 
 Recommended commands for Unity 404/302/reset troubleshooting:
 

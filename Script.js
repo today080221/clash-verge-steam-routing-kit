@@ -8,6 +8,7 @@ const MANAGED_GROUP_NAMES = [
   "SteamCommunity",
   "SteamMainland",
   "SteamDownload",
+  "BilibiliVideo",
 ];
 
 function unique(items) {
@@ -114,8 +115,14 @@ function main(config) {
     ...preferredGroups,
     ...proxyNames,
   ]);
+  const bilibiliVideoChoices = unique([
+    "DIRECT",
+    ...preferredGroups,
+    ...proxyNames,
+  ]);
 
   let nextGroups = proxyGroups;
+  nextGroups = upsertSelectGroup(nextGroups, "BilibiliVideo", bilibiliVideoChoices);
   nextGroups = upsertSelectGroup(nextGroups, "SteamDownload", steamDownloadChoices);
   nextGroups = upsertSelectGroup(nextGroups, "SteamMainland", steamMainlandChoices);
   nextGroups = upsertSelectGroup(nextGroups, "SteamCommunity", steamCommunityChoices);
@@ -200,7 +207,11 @@ function main(config) {
     "DOMAIN-SUFFIX,cdn.steamstatic.com,SteamMainland",
     "DOMAIN-SUFFIX,cdn.cloudflare.steamstatic.com,SteamMainland",
   ];
+  const bilibiliVideoRules = [
+    "DOMAIN-SUFFIX,bilivideo.com,BilibiliVideo",
+    "DOMAIN-SUFFIX,hdslb.com,BilibiliVideo",
+  ];
 
-  prependRules(nextConfig, [...unityRules, ...steamRules]);
+  prependRules(nextConfig, [...bilibiliVideoRules, ...unityRules, ...steamRules]);
   return nextConfig;
 }

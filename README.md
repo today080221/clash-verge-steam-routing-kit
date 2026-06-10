@@ -11,7 +11,7 @@
 
 本仓库的代码、结构和文档通过 AI 辅助生成与迭代完成。请在自己的环境中使用前先自行审阅脚本。
 
-它会向任意 Clash Verge Rev 订阅注入 9 个可复用分组：
+它会向任意 Clash Verge Rev 订阅注入 10 个可复用分组：
 
 - `UnityGlobal`：Unity 全球主分组，用来收敛 `UnityHub`、`UnityEditor`、`UnityDownload` 的默认出口
 - `UnityWeb`：Unity 网页与账号分组，负责浏览器里的 Unity ID、Asset Store 和相关 Web API
@@ -22,6 +22,7 @@
 - `SteamCommunity`：Steam 社区、聊天、头像，以及其他常见被拦截的 Steam Web 内容
 - `SteamMainland`：Steam 商店、登录、帮助，以及通常在中国大陆可正常访问的 Steam Web 流量
 - `SteamDownload`：Steam CDN、内容服务器，以及下载相关流量
+- `BilibiliVideo`：可选的 B 站视频 CDN 分组，用来在网页播放器 6003、CDN/DNS 异常时单独切换视频链路
 
 ## 这个仓库解决什么问题
 
@@ -29,6 +30,7 @@
 - 在不同服务商之间复用同一套规则，而不是反复手改订阅
 - 自动把新接入的远程订阅重新绑定到共享 `Script.js`
 - 把 Steam 社区、商店/登录、下载流量拆开分别调控
+- 把 B 站网页播放器相关 CDN 从通用中国直连规则里单独剥出来，必要时只切视频链路
 - 把 Unity 全球控制面、全球下载面、Unity 中国链路拆开分别调控
 - 让所有 Unity 全球相关分组都可以默认指向同一个 `UnityGlobal`，需要时再单独覆盖
 - 把浏览器里的 Unity ID、Asset Store 和 Unity Hub / Editor 链路拆开分别调控
@@ -79,6 +81,7 @@ install-steam-routing.bat
 - `SteamCommunity`：`自动选择`，或手动指定香港/日本节点
 - `SteamMainland`：`DIRECT`
 - `SteamDownload`：`DIRECT`
+- `BilibiliVideo`：默认 `DIRECT`；如果网页播放器出现 6003、但开启系统代理/全局代理后恢复，就临时切到一个稳定节点
 
 如果 Unity Hub 仍然出现 `Validation Failed`：
 
@@ -97,6 +100,13 @@ install-steam-routing.bat
 - 如果 UPM 仍然偶发不走 Clash，可按 Unity 官方代理文档给启动 Unity Hub / Editor 的进程注入 `HTTP_PROXY` 和 `HTTPS_PROXY`
 
 如果 Steam 商店出现 `-100` 错误，可以临时把 `SteamMainland` 从 `DIRECT` 改成和 `SteamCommunity` 相同的节点再测试。
+
+如果 B 站网页视频播放页出现错误码 `6003`：
+
+- 先把 `BilibiliVideo` 从 `DIRECT` 改成一个已经验证可用的节点或自动选择组
+- 这只会接管 `bilivideo.com` 与 `hdslb.com` 这类视频/静态 CDN，不会把所有 `bilibili.com` API 一起改走代理
+- 如果切换后立刻恢复，问题通常在本地直连 DNS/CDN 分配或运营商链路，而不是浏览器硬件解码
+- 如果仍然报错，再清一次页面缓存或打开无痕窗口测试，避免旧播放器请求继续复用失败连接
 
 用于 Unity 404/302/掉线排查的推荐命令：
 
