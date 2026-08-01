@@ -1,6 +1,6 @@
 # Clash Verge Steam Routing Kit
 
-A shared routing toolkit for Clash Verge Rev on Windows, focused on Steam and Unity Hub, with a stricter Unity China bypass strategy.
+A shared routing toolkit for Clash Verge Rev on Windows covering Steam, Unity, NVIDIA, and optional Bilibili video CDN routing, with a stricter Unity China bypass strategy.
 
 [![简体中文](https://img.shields.io/badge/简体中文-Read-0366d6?style=for-the-badge)](README.md)
 [![English](https://img.shields.io/badge/English-Current-2ea44f?style=for-the-badge)](README.en.md)
@@ -11,7 +11,7 @@ This repository is an AI-generated project.
 
 The code, structure, and documentation were produced through AI-assisted generation and iteration. Please review the scripts before using them in your own environment.
 
-It injects ten reusable groups into any Clash Verge Rev subscription:
+It injects twelve reusable groups into any Clash Verge Rev subscription:
 
 - `UnityGlobal`: Unity global parent selector that lets `UnityHub`, `UnityEditor`, and `UnityDownload` converge on the same upstream node
 - `UnityWeb`: Unity web and account traffic for browser-side Unity ID, Asset Store, and related web APIs
@@ -19,6 +19,8 @@ It injects ten reusable groups into any Clash Verge Rev subscription:
 - `UnityEditor`: Unity Editor APIs, package-manager traffic, analytics, and auxiliary cloud services
 - `UnityDownload`: Unity global download-plane traffic for editor, modules, and package delivery
 - `UnityChina`: an isolation group for China-specific Unity domains such as `unity.cn`, `unitychina.cn`, and `u3d.cn`
+- `NvidiaServices`: NVIDIA web, sign-in, control-plane, and other official service traffic
+- `NvidiaDownload`: NVIDIA driver, NVIDIA App, and OTA payload downloads, with direct routing as the default
 - `SteamCommunity`: Steam community, chat, avatars, and other commonly blocked Steam web content
 - `SteamMainland`: Steam store, login, help, and general Steam web traffic that usually works from mainland China
 - `SteamDownload`: Steam CDN, content servers, and download-related traffic
@@ -26,11 +28,12 @@ It injects ten reusable groups into any Clash Verge Rev subscription:
 
 ## What This Repo Solves
 
-- Reuses the same Steam and Unity Hub routing logic across multiple PCs
+- Reuses the same Steam, Unity, and NVIDIA routing logic across multiple PCs
 - Applies the same split-routing behavior across different providers
 - Rebinds newly added remote subscriptions to the shared `Script.js`
 - Separates Steam community, store/login, and download traffic so they can be tuned independently
 - Separates Bilibili web-player CDN traffic from generic China-direct rules so only the video path needs to be switched when needed
+- Separates NVIDIA service traffic from driver and app payloads so large downloads do not have to follow the sign-in or web route
 - Separates Unity global control, Unity global download, and Unity China traffic so they can be tuned independently
 - Lets all global Unity groups point to the same `UnityGlobal` selector by default while still allowing per-group overrides
 - Separates browser-side Unity ID and Asset Store traffic from Unity Hub and Unity Editor traffic
@@ -47,6 +50,20 @@ That means "proxy `download.unitychina.cn`" alone is not enough if your goal is 
 - `UnityEditor`: defaults to `UnityGlobal`, for Unity Editor APIs, package-manager traffic, analytics, and auxiliary cloud services
 - `UnityDownload`: defaults to `UnityGlobal`, to keep editor and module downloads on the global path
 - `UnityChina`: `REJECT` by default, to block dedicated Unity China domains instead of silently falling back to them
+
+## Why `NvidiaDownload` Exists
+
+NVIDIA driver and NVIDIA App payloads are usually large, and NVIDIA App may transfer them in concurrent segments. NVIDIA Support explicitly notes that proxies or download managers can interfere with file transfer and corrupt downloads; the official NVIDIA App entrypoint also serves its installer from download hosts such as `us.download.nvidia.com`.
+
+The rules therefore use a conservative service/download boundary:
+
+- `NvidiaServices` captures the broader official `nvidia.com` and `nvidia.cn` service domains, defaults to auto-select/proxy, and still offers `DIRECT`
+- `NvidiaDownload` takes higher-priority ownership of `*.download.nvidia.com` and `ota-downloads.nvidia.com`, defaults to `DIRECT`, and keeps proxy choices available when the direct CDN path is unhealthy
+- independent ecosystems such as GeForce NOW are not captured automatically, so low-latency game streaming is not mixed with driver delivery
+
+References: [NVIDIA on proxies affecting download integrity](https://nvidia.custhelp.com/app/answers/detail/a_id/21); [official NVIDIA App download page](https://www.nvidia.com/en-us/software/nvidia-app/).
+
+Clash rules can only control connections that actually enter Clash. If Proxifier separately sends NVIDIA processes to another upstream proxy, the result may still be a double-proxy path; send NVIDIA directly into Clash or bypass the download traffic in Proxifier instead.
 
 ## Install on Another Windows PC
 
@@ -78,6 +95,8 @@ You only need to download the package once. After that, keep using the same `ins
 - `UnityEditor`: point it to `UnityGlobal`
 - `UnityDownload`: point it to `UnityGlobal`
 - `UnityChina`: `REJECT`
+- `NvidiaServices`: `Auto Select` or a stable node, with `DIRECT` available as an independent override
+- `NvidiaDownload`: `DIRECT`; switch to a stable node only when the direct CDN path is unhealthy
 - `SteamCommunity`: `Auto Select`, or a Hong Kong/Japan node
 - `SteamMainland`: `DIRECT`
 - `SteamDownload`: `DIRECT`
@@ -100,6 +119,13 @@ If Unity Hub still shows `Validation Failed`:
 - if UPM still bypasses Clash intermittently, follow Unity's proxy guidance and launch Unity Hub or the Editor with `HTTP_PROXY` and `HTTPS_PROXY`
 
 If the Steam store shows `-100`, temporarily change `SteamMainland` from `DIRECT` to the same node as `SteamCommunity` and test again.
+
+If an NVIDIA App driver download fails:
+
+- first make sure `NvidiaDownload` is still set to `DIRECT`, then restart the download; hosts such as `international-gfe.download.nvidia.com` and `us.download.nvidia.com` take the higher-priority download route
+- `NvidiaServices` is independent from the download group, so sign-in, release metadata, or web access can use a proxy without sending the large driver payload through the same node
+- when both the Windows system proxy and Proxifier are enabled, avoid sending NVIDIA through a second remote proxy; let the connection receive one Clash routing decision
+- if the ISP's direct CDN path itself is slow or broken, temporarily switch only `NvidiaDownload` to a stable node instead of changing the entire NVIDIA service route
 
 If the Bilibili web player shows error code `6003`:
 

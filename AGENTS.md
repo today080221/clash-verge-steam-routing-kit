@@ -4,11 +4,12 @@ This file captures project-specific guidance for agents working in this reposito
 
 ## Purpose
 
-This repository is a reusable Steam and Unity routing kit for Clash Verge Rev on Windows, with an explicit Unity China isolation layer.
+This repository is a reusable Steam, Unity, and NVIDIA routing kit for Clash Verge Rev on Windows, with an explicit Unity China isolation layer.
 
 It provides a shared routing layer that:
 
 - splits Unity traffic into `UnityGlobal`, `UnityWeb`, `UnityHub`, `UnityEditor`, `UnityDownload`, and `UnityChina`
+- splits NVIDIA traffic into `NvidiaServices` and `NvidiaDownload`
 - splits Steam traffic into `SteamCommunity`, `SteamMainland`, and `SteamDownload`
 - optionally splits Bilibili web-player CDN traffic into `BilibiliVideo`
 - keeps the same routing logic reusable across different providers
@@ -24,6 +25,8 @@ Treat the following group names as stable public interface unless the user expli
 - `UnityEditor`
 - `UnityDownload`
 - `UnityChina`
+- `NvidiaServices`
+- `NvidiaDownload`
 - `SteamCommunity`
 - `SteamMainland`
 - `SteamDownload`
@@ -37,6 +40,8 @@ The intended defaults are:
 - `UnityEditor`: point to `UnityGlobal` by default
 - `UnityDownload`: point to `UnityGlobal` by default
 - `UnityChina`: `REJECT`
+- `NvidiaServices`: proxy or auto-select, with `DIRECT` available
+- `NvidiaDownload`: `DIRECT` first, with proxy choices available for download-path troubleshooting
 - `SteamCommunity`: proxy or auto-select
 - `SteamMainland`: `DIRECT` first
 - `SteamDownload`: `DIRECT`
@@ -165,7 +170,9 @@ When changing routing behavior:
 
 - preserve the Unity global parent group plus Web/Hub/Editor/Download/China split unless explicitly asked to redesign it
 - prefer additive, targeted rule fixes over broad changes
-- remember that Unity global parent routing, Unity browser/account traffic, Unity global control traffic, Unity Editor API/package traffic, Unity global download traffic, Unity China traffic, Steam community traffic, mainland web traffic, and download traffic may need different routing behavior
+- keep NVIDIA download-specific rules ahead of the broader NVIDIA service rules so driver and app payloads remain independently selectable
+- keep `NvidiaDownload` on `DIRECT` by default, but preserve proxy choices for networks where the direct CDN path is unhealthy
+- remember that Unity global parent routing, Unity browser/account traffic, Unity global control traffic, Unity Editor API/package traffic, Unity global download traffic, Unity China traffic, NVIDIA service traffic, NVIDIA download traffic, Steam community traffic, mainland web traffic, and download traffic may need different routing behavior
 - keep `UnityChina` isolated from the global Unity path unless the user explicitly asks otherwise
 - keep installation and release docs aligned with actual script behavior
 
