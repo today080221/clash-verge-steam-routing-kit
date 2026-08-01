@@ -105,5 +105,5 @@ if ($watcherWasRunning -or -not (Get-WatcherProcesses)) {
   Start-Process powershell.exe -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-WindowStyle','Hidden','-File', $watcherScriptPath | Out-Null
 }
 
-Write-Host "Installed Clash Verge Steam and Unity routing pack."
+Write-Host "Installed Clash Verge shared routing pack."
 Write-Host "If Clash Verge Rev is open, restart it once or switch subscriptions once."

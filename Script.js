@@ -5,6 +5,8 @@ const MANAGED_GROUP_NAMES = [
   "UnityEditor",
   "UnityDownload",
   "UnityChina",
+  "NvidiaServices",
+  "NvidiaDownload",
   "SteamCommunity",
   "SteamMainland",
   "SteamDownload",
@@ -100,6 +102,16 @@ function main(config) {
     ...preferredGroups,
     ...proxyNames,
   ]);
+  const nvidiaServicesChoices = unique([
+    ...preferredGroups,
+    ...proxyNames,
+    "DIRECT",
+  ]);
+  const nvidiaDownloadChoices = unique([
+    "DIRECT",
+    ...preferredGroups,
+    ...proxyNames,
+  ]);
   const steamCommunityChoices = unique([
     ...preferredGroups,
     ...proxyNames,
@@ -126,6 +138,8 @@ function main(config) {
   nextGroups = upsertSelectGroup(nextGroups, "SteamDownload", steamDownloadChoices);
   nextGroups = upsertSelectGroup(nextGroups, "SteamMainland", steamMainlandChoices);
   nextGroups = upsertSelectGroup(nextGroups, "SteamCommunity", steamCommunityChoices);
+  nextGroups = upsertSelectGroup(nextGroups, "NvidiaDownload", nvidiaDownloadChoices);
+  nextGroups = upsertSelectGroup(nextGroups, "NvidiaServices", nvidiaServicesChoices);
   nextGroups = upsertSelectGroup(nextGroups, "UnityChina", unityChinaChoices);
   nextGroups = upsertSelectGroup(nextGroups, "UnityDownload", unityDownloadChoices);
   nextGroups = upsertSelectGroup(nextGroups, "UnityEditor", unityEditorChoices);
@@ -211,7 +225,13 @@ function main(config) {
     "DOMAIN-SUFFIX,bilivideo.com,BilibiliVideo",
     "DOMAIN-SUFFIX,hdslb.com,BilibiliVideo",
   ];
+  const nvidiaRules = [
+    "DOMAIN-SUFFIX,download.nvidia.com,NvidiaDownload",
+    "DOMAIN,ota-downloads.nvidia.com,NvidiaDownload",
+    "DOMAIN-SUFFIX,nvidia.com,NvidiaServices",
+    "DOMAIN-SUFFIX,nvidia.cn,NvidiaServices",
+  ];
 
-  prependRules(nextConfig, [...bilibiliVideoRules, ...unityRules, ...steamRules]);
+  prependRules(nextConfig, [...nvidiaRules, ...bilibiliVideoRules, ...unityRules, ...steamRules]);
   return nextConfig;
 }
