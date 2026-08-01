@@ -19,7 +19,7 @@ It injects twelve reusable groups into any Clash Verge Rev subscription:
 - `UnityEditor`: Unity Editor APIs, package-manager traffic, analytics, and auxiliary cloud services
 - `UnityDownload`: Unity global download-plane traffic for editor, modules, and package delivery
 - `UnityChina`: an isolation group for China-specific Unity domains such as `unity.cn`, `unitychina.cn`, and `u3d.cn`
-- `NvidiaServices`: NVIDIA web, sign-in, control-plane, and other official service traffic
+- `NvidiaServices`: NVIDIA web, sign-in, control-plane, and other official service traffic, with direct routing as the default
 - `NvidiaDownload`: NVIDIA driver, NVIDIA App, and OTA payload downloads, with direct routing as the default
 - `SteamCommunity`: Steam community, chat, avatars, and other commonly blocked Steam web content
 - `SteamMainland`: Steam store, login, help, and general Steam web traffic that usually works from mainland China
@@ -55,13 +55,13 @@ That means "proxy `download.unitychina.cn`" alone is not enough if your goal is 
 
 NVIDIA driver and NVIDIA App payloads are usually large, and NVIDIA App may transfer them in concurrent segments. NVIDIA Support explicitly notes that proxies or download managers can interfere with file transfer and corrupt downloads; the official NVIDIA App entrypoint also serves its installer from download hosts such as `us.download.nvidia.com`.
 
-The rules therefore use a conservative service/download boundary:
+The rules therefore use a conservative service/download boundary. NVIDIA provides official mainland-China NVIDIA App and account entrypoints; v1.7.1 also verified direct DNS, TLS, and HTTP reachability against service hosts observed in NVIDIA App logs. Both NVIDIA groups consequently put `DIRECT` first while retaining proxy fallbacks:
 
-- `NvidiaServices` captures the broader official `nvidia.com` and `nvidia.cn` service domains, defaults to auto-select/proxy, and still offers `DIRECT`
+- `NvidiaServices` captures the broader official `nvidia.com` and `nvidia.cn` service domains, defaults to `DIRECT`, and can be switched independently when sign-in or service traffic needs a proxy
 - `NvidiaDownload` takes higher-priority ownership of `*.download.nvidia.com` and `ota-downloads.nvidia.com`, defaults to `DIRECT`, and keeps proxy choices available when the direct CDN path is unhealthy
 - independent ecosystems such as GeForce NOW are not captured automatically, so low-latency game streaming is not mixed with driver delivery
 
-References: [NVIDIA on proxies affecting download integrity](https://nvidia.custhelp.com/app/answers/detail/a_id/21); [official NVIDIA App download page](https://www.nvidia.com/en-us/software/nvidia-app/).
+References: [official NVIDIA China App page](https://www.nvidia.cn/software/nvidia-app/); [NVIDIA China account FAQ](https://www.nvidia.cn/account/faq/); [NVIDIA on proxies affecting download integrity](https://nvidia.custhelp.com/app/answers/detail/a_id/21).
 
 Clash rules can only control connections that actually enter Clash. If Proxifier separately sends NVIDIA processes to another upstream proxy, the result may still be a double-proxy path; send NVIDIA directly into Clash or bypass the download traffic in Proxifier instead.
 
@@ -95,7 +95,7 @@ You only need to download the package once. After that, keep using the same `ins
 - `UnityEditor`: point it to `UnityGlobal`
 - `UnityDownload`: point it to `UnityGlobal`
 - `UnityChina`: `REJECT`
-- `NvidiaServices`: `Auto Select` or a stable node, with `DIRECT` available as an independent override
+- `NvidiaServices`: `DIRECT`; switch only this group to a stable node if sign-in, release metadata, or web services fail on the direct path
 - `NvidiaDownload`: `DIRECT`; switch to a stable node only when the direct CDN path is unhealthy
 - `SteamCommunity`: `Auto Select`, or a Hong Kong/Japan node
 - `SteamMainland`: `DIRECT`
@@ -123,7 +123,7 @@ If the Steam store shows `-100`, temporarily change `SteamMainland` from `DIRECT
 If an NVIDIA App driver download fails:
 
 - first make sure `NvidiaDownload` is still set to `DIRECT`, then restart the download; hosts such as `international-gfe.download.nvidia.com` and `us.download.nvidia.com` take the higher-priority download route
-- `NvidiaServices` is independent from the download group, so sign-in, release metadata, or web access can use a proxy without sending the large driver payload through the same node
+- `NvidiaServices` is independent from the download group; it also defaults to `DIRECT`, but sign-in, release metadata, or web access can use a proxy without sending the large driver payload through the same node
 - when both the Windows system proxy and Proxifier are enabled, avoid sending NVIDIA through a second remote proxy; let the connection receive one Clash routing decision
 - if the ISP's direct CDN path itself is slow or broken, temporarily switch only `NvidiaDownload` to a stable node instead of changing the entire NVIDIA service route
 
