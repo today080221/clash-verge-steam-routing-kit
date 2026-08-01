@@ -103,9 +103,9 @@ function main(config) {
     ...proxyNames,
   ]);
   const nvidiaServicesChoices = unique([
+    "DIRECT",
     ...preferredGroups,
     ...proxyNames,
-    "DIRECT",
   ]);
   const nvidiaDownloadChoices = unique([
     "DIRECT",

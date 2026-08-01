@@ -19,7 +19,7 @@
 - `UnityEditor`：Unity Editor 相关 API、包管理、分析与辅助云服务
 - `UnityDownload`：Unity 全球下载面，负责 Editor、模块与包下载链路
 - `UnityChina`：Unity 中国链路隔离组，负责 `unity.cn`、`unitychina.cn`、`u3d.cn` 等中国专用域名
-- `NvidiaServices`：NVIDIA 网页、登录、控制面与其他官方服务流量
+- `NvidiaServices`：NVIDIA 网页、登录、控制面与其他官方服务流量，默认直连
 - `NvidiaDownload`：NVIDIA 驱动、NVIDIA App 与 OTA 包体下载流量，默认直连
 - `SteamCommunity`：Steam 社区、聊天、头像，以及其他常见被拦截的 Steam Web 内容
 - `SteamMainland`：Steam 商店、登录、帮助，以及通常在中国大陆可正常访问的 Steam Web 流量
@@ -55,13 +55,13 @@ Unity 官方面向全球的 Hub 与下载链路主要在 `unity.com`、`unity3d.
 
 NVIDIA 驱动和 NVIDIA App 包体通常体积很大，而且 NVIDIA App 可能使用并发分段传输。NVIDIA 官方支持文档明确说明，代理或下载管理器可能影响文件传输并造成下载损坏；NVIDIA App 的官方安装入口也直接使用 `us.download.nvidia.com` 这类下载主机。
 
-当前规则因此采用“服务与下载分离”的保守边界：
+当前规则因此采用“服务与下载分离”的保守边界。NVIDIA 在中国大陆提供官方 NVIDIA App 与中国账户入口；v1.7.1 也用 NVIDIA App 日志中的实际服务主机验证了直连 DNS、TLS 与 HTTP 可达性，因此两个 NVIDIA 分组都把 `DIRECT` 放在第一项，同时保留代理兜底：
 
-- `NvidiaServices`：接管更宽的 `nvidia.com` 与 `nvidia.cn` 官方服务域名，默认使用自动选择/代理，同时保留 `DIRECT`
+- `NvidiaServices`：接管更宽的 `nvidia.com` 与 `nvidia.cn` 官方服务域名，默认 `DIRECT`，直连登录或服务异常时可单独切到代理
 - `NvidiaDownload`：以更高优先级接管 `*.download.nvidia.com` 与 `ota-downloads.nvidia.com`，默认 `DIRECT`，同时保留代理选项用于直连 CDN 异常时切换
 - 不自动接管 GeForce NOW 等独立域名生态，避免把低延迟流媒体服务和驱动下载混为一组
 
-参考：[NVIDIA 关于代理影响下载完整性的说明](https://nvidia.custhelp.com/app/answers/detail/a_id/21)；[NVIDIA App 官方下载页](https://www.nvidia.com/en-us/software/nvidia-app/)。
+参考：[NVIDIA 中国 App 官方页](https://www.nvidia.cn/software/nvidia-app/)；[NVIDIA 中国账户常见问题](https://www.nvidia.cn/account/faq/)；[NVIDIA 关于代理影响下载完整性的说明](https://nvidia.custhelp.com/app/answers/detail/a_id/21)。
 
 注意：Clash 规则只能控制已经进入 Clash 的连接。如果 Proxifier 又把 NVIDIA 进程单独送到另一个上游代理，仍可能形成双层代理；这时应让 NVIDIA 进程直接进入 Clash，或在 Proxifier 中对下载流量设为直连。
 
@@ -95,7 +95,7 @@ install-steam-routing.bat
 - `UnityEditor`：默认指向 `UnityGlobal`
 - `UnityDownload`：默认指向 `UnityGlobal`
 - `UnityChina`：`REJECT`
-- `NvidiaServices`：`自动选择`，或手动指定一个稳定节点；需要时可单独切 `DIRECT`
+- `NvidiaServices`：`DIRECT`；如果登录、版本信息或网页服务直连异常，再单独切到稳定节点
 - `NvidiaDownload`：`DIRECT`；只有直连 CDN 异常时再切到稳定节点
 - `SteamCommunity`：`自动选择`，或手动指定香港/日本节点
 - `SteamMainland`：`DIRECT`
@@ -123,7 +123,7 @@ install-steam-routing.bat
 如果 NVIDIA App 驱动下载失败：
 
 - 先确认 `NvidiaDownload` 仍为 `DIRECT`，再重新开始下载任务；`international-gfe.download.nvidia.com`、`us.download.nvidia.com` 等下载主机会优先命中这个组
-- `NvidiaServices` 与下载组互不绑定，登录、版本信息或网页访问需要代理时，不必让大驱动包也经过同一个节点
+- `NvidiaServices` 与下载组互不绑定；它也默认 `DIRECT`，但登录、版本信息或网页访问需要代理时，可以只切这个服务组
 - 如果同时使用系统代理和 Proxifier，避免再把 NVIDIA 进程送往第二个远端代理；让连接只经过一次 Clash 决策
 - 如果运营商直连 CDN 本身很慢或失败，再把 `NvidiaDownload` 临时切到一个稳定节点，不需要改动整个 NVIDIA 服务出口
 
