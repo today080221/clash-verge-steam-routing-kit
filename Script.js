@@ -227,6 +227,7 @@ function main(config) {
   ];
   const nvidiaRules = [
     "DOMAIN-SUFFIX,download.nvidia.com,NvidiaDownload",
+    "DOMAIN-SUFFIX,download.nvidia.cn,NvidiaDownload",
     "DOMAIN,ota-downloads.nvidia.com,NvidiaDownload",
     "DOMAIN-SUFFIX,nvidia.com,NvidiaServices",
     "DOMAIN-SUFFIX,nvidia.cn,NvidiaServices",

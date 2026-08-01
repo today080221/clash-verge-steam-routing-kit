@@ -55,10 +55,10 @@ That means "proxy `download.unitychina.cn`" alone is not enough if your goal is 
 
 NVIDIA driver and NVIDIA App payloads are usually large, and NVIDIA App may transfer them in concurrent segments. NVIDIA Support explicitly notes that proxies or download managers can interfere with file transfer and corrupt downloads; the official NVIDIA App entrypoint also serves its installer from download hosts such as `us.download.nvidia.com`.
 
-The rules therefore use a conservative service/download boundary. NVIDIA provides official mainland-China NVIDIA App and account entrypoints; v1.7.1 also verified direct DNS, TLS, and HTTP reachability against service hosts observed in NVIDIA App logs. Both NVIDIA groups consequently put `DIRECT` first while retaining proxy fallbacks:
+The rules therefore use a conservative service/download boundary. NVIDIA provides official mainland-China NVIDIA App and account entrypoints; v1.7.1 also verified direct DNS, TLS, and HTTP reachability against service hosts observed in NVIDIA App logs. Both NVIDIA groups consequently put `DIRECT` first while retaining proxy fallbacks. Based on a real driver-download response, v1.7.2 also keeps the second hop from the `.com` host to the redirected `.cn` host in the download group:
 
 - `NvidiaServices` captures the broader official `nvidia.com` and `nvidia.cn` service domains, defaults to `DIRECT`, and can be switched independently when sign-in or service traffic needs a proxy
-- `NvidiaDownload` takes higher-priority ownership of `*.download.nvidia.com` and `ota-downloads.nvidia.com`, defaults to `DIRECT`, and keeps proxy choices available when the direct CDN path is unhealthy
+- `NvidiaDownload` takes higher-priority ownership of `*.download.nvidia.com`, `*.download.nvidia.cn`, and `ota-downloads.nvidia.com`, defaults to `DIRECT`, and keeps proxy choices available when the direct CDN path is unhealthy
 - independent ecosystems such as GeForce NOW are not captured automatically, so low-latency game streaming is not mixed with driver delivery
 
 References: [official NVIDIA China App page](https://www.nvidia.cn/software/nvidia-app/); [NVIDIA China account FAQ](https://www.nvidia.cn/account/faq/); [NVIDIA on proxies affecting download integrity](https://nvidia.custhelp.com/app/answers/detail/a_id/21).
@@ -122,7 +122,7 @@ If the Steam store shows `-100`, temporarily change `SteamMainland` from `DIRECT
 
 If an NVIDIA App driver download fails:
 
-- first make sure `NvidiaDownload` is still set to `DIRECT`, then restart the download; hosts such as `international-gfe.download.nvidia.com` and `us.download.nvidia.com` take the higher-priority download route
+- first make sure `NvidiaDownload` is still set to `DIRECT`, then restart the download; hosts such as `international-gfe.download.nvidia.com`, redirected `international-gfe.download.nvidia.cn`, and `us.download.nvidia.com` stay on the higher-priority download route
 - `NvidiaServices` is independent from the download group; it also defaults to `DIRECT`, but sign-in, release metadata, or web access can use a proxy without sending the large driver payload through the same node
 - when both the Windows system proxy and Proxifier are enabled, avoid sending NVIDIA through a second remote proxy; let the connection receive one Clash routing decision
 - if the ISP's direct CDN path itself is slow or broken, temporarily switch only `NvidiaDownload` to a stable node instead of changing the entire NVIDIA service route

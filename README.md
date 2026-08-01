@@ -55,10 +55,10 @@ Unity 官方面向全球的 Hub 与下载链路主要在 `unity.com`、`unity3d.
 
 NVIDIA 驱动和 NVIDIA App 包体通常体积很大，而且 NVIDIA App 可能使用并发分段传输。NVIDIA 官方支持文档明确说明，代理或下载管理器可能影响文件传输并造成下载损坏；NVIDIA App 的官方安装入口也直接使用 `us.download.nvidia.com` 这类下载主机。
 
-当前规则因此采用“服务与下载分离”的保守边界。NVIDIA 在中国大陆提供官方 NVIDIA App 与中国账户入口；v1.7.1 也用 NVIDIA App 日志中的实际服务主机验证了直连 DNS、TLS 与 HTTP 可达性，因此两个 NVIDIA 分组都把 `DIRECT` 放在第一项，同时保留代理兜底：
+当前规则因此采用“服务与下载分离”的保守边界。NVIDIA 在中国大陆提供官方 NVIDIA App 与中国账户入口；v1.7.1 也用 NVIDIA App 日志中的实际服务主机验证了直连 DNS、TLS 与 HTTP 可达性，因此两个 NVIDIA 分组都把 `DIRECT` 放在第一项，同时保留代理兜底。v1.7.2 进一步根据真实驱动下载响应补齐了从 `.com` 重定向到 `.cn` 的第二跳：
 
 - `NvidiaServices`：接管更宽的 `nvidia.com` 与 `nvidia.cn` 官方服务域名，默认 `DIRECT`，直连登录或服务异常时可单独切到代理
-- `NvidiaDownload`：以更高优先级接管 `*.download.nvidia.com` 与 `ota-downloads.nvidia.com`，默认 `DIRECT`，同时保留代理选项用于直连 CDN 异常时切换
+- `NvidiaDownload`：以更高优先级接管 `*.download.nvidia.com`、`*.download.nvidia.cn` 与 `ota-downloads.nvidia.com`，默认 `DIRECT`，同时保留代理选项用于直连 CDN 异常时切换
 - 不自动接管 GeForce NOW 等独立域名生态，避免把低延迟流媒体服务和驱动下载混为一组
 
 参考：[NVIDIA 中国 App 官方页](https://www.nvidia.cn/software/nvidia-app/)；[NVIDIA 中国账户常见问题](https://www.nvidia.cn/account/faq/)；[NVIDIA 关于代理影响下载完整性的说明](https://nvidia.custhelp.com/app/answers/detail/a_id/21)。
@@ -122,7 +122,7 @@ install-steam-routing.bat
 
 如果 NVIDIA App 驱动下载失败：
 
-- 先确认 `NvidiaDownload` 仍为 `DIRECT`，再重新开始下载任务；`international-gfe.download.nvidia.com`、`us.download.nvidia.com` 等下载主机会优先命中这个组
+- 先确认 `NvidiaDownload` 仍为 `DIRECT`，再重新开始下载任务；`international-gfe.download.nvidia.com`、`international-gfe.download.nvidia.cn`、`us.download.nvidia.com` 等下载主机和重定向后的中国 CDN 会持续命中这个组
 - `NvidiaServices` 与下载组互不绑定；它也默认 `DIRECT`，但登录、版本信息或网页访问需要代理时，可以只切这个服务组
 - 如果同时使用系统代理和 Proxifier，避免再把 NVIDIA 进程送往第二个远端代理；让连接只经过一次 Clash 决策
 - 如果运营商直连 CDN 本身很慢或失败，再把 `NvidiaDownload` 临时切到一个稳定节点，不需要改动整个 NVIDIA 服务出口
