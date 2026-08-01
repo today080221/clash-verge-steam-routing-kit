@@ -171,6 +171,7 @@ When changing routing behavior:
 - preserve the Unity global parent group plus Web/Hub/Editor/Download/China split unless explicitly asked to redesign it
 - prefer additive, targeted rule fixes over broad changes
 - keep NVIDIA download-specific rules ahead of the broader NVIDIA service rules so driver and app payloads remain independently selectable
+- keep both `download.nvidia.com` and redirected `download.nvidia.cn` hosts in `NvidiaDownload`; NVIDIA driver delivery may redirect from the global hostname to the China CDN
 - keep `NvidiaServices` on `DIRECT` by default, but preserve proxy choices for networks where sign-in or service traffic needs an alternate path
 - keep `NvidiaDownload` on `DIRECT` by default, but preserve proxy choices for networks where the direct CDN path is unhealthy
 - remember that Unity global parent routing, Unity browser/account traffic, Unity global control traffic, Unity Editor API/package traffic, Unity global download traffic, Unity China traffic, NVIDIA service traffic, NVIDIA download traffic, Steam community traffic, mainland web traffic, and download traffic may need different routing behavior
