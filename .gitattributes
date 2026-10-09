@@ -1,0 +1,14 @@
+# Fixed-byte inputs: source, deployed runtime and downstream provenance use SHA-256.
+# Preserve reviewed bytes across checkout/archive, regardless of core.autocrlf.
+.gitattributes text eol=lf
+Script.js -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+config/claude-privacy-domains.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+enable-claude-privacy.ps1 -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+scripts/ClaudePrivacy.Enablement.psm1 -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+claude-privacy.ps1 -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+scripts/ClaudePrivacy.Core.psm1 -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+scripts/ClaudePrivacy.Windows.psm1 -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+scripts/ClaudePrivacy.Maintenance.psm1 -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+scripts/ClaudePrivacy.Host.cs -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/claude-privacy-handoff.md -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tests/fixtures/legacy-routing-v1.5.0.js.txt -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

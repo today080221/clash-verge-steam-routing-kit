@@ -17,3 +17,9 @@ profiles/
 # OS noise
 desktop.ini
 Thumbs.db
+
+# Isolated tests, generated compositions and machine ownership state
+.test-tmp/
+.codex/private/
+*.local.js
+steam-routing-kit-state.json

@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "domainSuffixes": ["anthropic.com", "claude.ai", "claude.com", "claude.app", "claudeusercontent.com", "claudemcpcontent.com"],
+  "source": "https://code.claude.com/docs/en/desktop#network-access-requirements",
+  "verifiedOn": "2026-10-08",
+  "notes": "Network routing suffixes, including resource and preview hosts; not a list of Chrome top-level page policy targets."
+}

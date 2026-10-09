@@ -110,6 +110,25 @@ The release zip should include:
 - `README.en.md`
 - `VERSION`
 - `LICENSE`
+- `compose-routing-script.ps1`
+- `claude-privacy.bat`
+- `claude-privacy.ps1`
+- `enable-claude-privacy.bat`
+- `enable-claude-privacy.ps1`
+- `scripts/RoutingKit.psm1`
+- `scripts/ClaudePrivacy.Core.psm1`
+- `scripts/ClaudePrivacy.Windows.psm1`
+- `scripts/ClaudePrivacy.Maintenance.psm1`
+- `scripts/ClaudePrivacy.Host.cs`
+- `scripts/ClaudePrivacy.Enablement.psm1`
+- `config/claude-privacy-domains.json`
+- `docs/claude-privacy-handoff.md`
+- `CHANGELOG.md`
+- `release-files.txt`
+- `build-release.ps1`
+- `tests/` (all fixture and test files listed explicitly in `release-files.txt`)
+
+`release-files.txt` is the executable packaging allowlist. Build local assets with `build-release.ps1`; never zip AppData or arbitrary working folders. Do not publish or bump `VERSION` unless release work is authorized.
 
 If documentation language layout changes, publish a new release so downloaded assets match the repository homepage.
 
@@ -133,6 +152,10 @@ The actual installer logic should remain in:
 
 - `install-steam-routing.ps1`
 
+The installer owns only `profiles/SteamRoutingKit.js` with a hash manifest. It must never overwrite generic `Script.js`, `Merge.yaml`, `profiles.yaml`, or automatically bind subscriptions. Users explicitly create/update script cards and select subscriptions. The old sync entrypoint is now a one-shot managed-file updater, and the VBS is only a compatibility notice. Never restore automatic rebinding or automatic Clash restart.
+
+Legacy migration is explicit (`-MigrateLegacy`) and supports `-WhatIf`. Only recognized legacy scripts/startup content and exact process `-File` paths may be disabled, with backups. Unknown/customized installations require review. Compose public routing and private owner enhancements explicitly with separate function scopes, public first and owner second.
+
 Do not duplicate complex update or install logic into the batch file.
 
 ## Diagnostic Conventions
@@ -151,6 +174,16 @@ The diagnostic script is responsible for:
 - showing current Clash mode, TUN state, system proxy state, and Unity group selections
 
 ## Security And Privacy
+
+Claude privacy protection is optional and independent from installation. Its default action is read-only status. Keep Chrome URL policy scoped to the three documented page domains; the six network suffixes in `config/claude-privacy-domains.json` are a separate public interface. That JSON is the authoritative source for downstream vendoring.
+
+Firewall protection uses verified exact Claude executable paths, never global UDP blocking or unverified MSIX package identity assumptions. Preserve ownership journals, reject user edits/collisions, support preview/apply/refresh/rollback, and add new paths before pruning stale ones. Never claim registry/firewall configuration proves browser ICE or process-level UDP enforcement. Test with isolated adapters and fixtures; real machine enablement requires task authorization.
+
+Keep protection scope explicit: new/legacy state defaults to `Desktop`; `DesktopAndCli` opts in to the official native Windows CLI, with the choice persisted for subsequent refreshes. Independently verify signatures and exact product/company metadata for Desktop and NativeCli. A verified same-name CLI outside Desktop scope is reported and excluded, while unknown identities still fail discovery. Combined scope must discover the current user's `.local/bin/claude.exe` even when it is not running. Never execute Claude during discovery, expand scope through automatic refresh, or target generic Node/WSL/VM hosts. Rollback disables both owned rule kinds but preserves the selected scope for later explicit enablement.
+
+Automatic privacy maintenance is separately enabled and must use the same user's InteractiveToken/HighestAvailable task with no saved password, protected deployed code, administrator-owned task ACLs, and verified file/definition fingerprints. Never run privileged maintenance from a user-writable checkout. Keep the two-minute/logon triggers bounded; report delays and failures without claiming gap-free protection. Rollback must persist the disabled gate and remove only the owned task before removing protection. A queued refresh must never re-enable after rollback. The one-time enablement entry requests one same-user UAC elevation, validates real task execution and rollback coordination, and restores the requested enabled final state; its receipt must distinguish configuration checks from unproven network enforcement.
+
+Scheduled maintenance must start through the protected GUI-subsystem host and create its PowerShell child with CreateNoWindow and UseShellExecute=false. Do not treat WindowStyle or the scheduler Hidden field as proof that no console appears. Compile the reviewed C# source with the verified system compiler, pin the generated executable and build record, and keep existing-runtime upgrades ownership-aware. MaintenanceOnly upgrades must retain enabled protection, scope, rules and Chrome policy. Preserve fresh discovery/signature/fingerprint checks while removing redundant no-op work; do not silently change the two-minute frequency. Validate quiet operation on natural task cycles using actual visible-window observation attributed to the host and its descendants, and distinguish wall time from CPU time.
 
 Never commit personal or provider-specific runtime data.
 
@@ -194,6 +227,8 @@ Before finishing a change, check at least:
 - release-facing filenames referenced in docs match the repository files
 - `AGENTS.md` stays aligned with the actual documentation and release workflow
 - no sensitive local files are staged
+- `powershell.exe -NoProfile -ExecutionPolicy Bypass -File tests/run-tests.ps1` passes without machine configuration writes
+- release allowlist includes all runtime modules and domain data
 
 ## Git Hygiene
 

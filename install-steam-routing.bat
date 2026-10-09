@@ -34,6 +34,7 @@ if not "%EXITCODE%"=="0" (
 )
 
 echo Installation completed successfully.
-echo Restart Clash Verge Rev once, or switch subscriptions once.
+echo Copy profiles\SteamRoutingKit.js into a Clash script card and select the intended subscriptions.
+echo Existing custom bindings are preserved. See README for legacy migration and composition.
 pause
 exit /b 0

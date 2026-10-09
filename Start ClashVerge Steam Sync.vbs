@@ -1,2 +1,2 @@
-Set WshShell = CreateObject("WScript.Shell")
-WshShell.Run "powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File ""%APPDATA%\io.github.clash-verge-rev.clash-verge-rev\sync-clash-verge-steam-script.ps1""", 0, False
+' Compatibility notice only. Automatic subscription rebinding was retired.
+MsgBox "Background rebinding has been retired. Run the routing-kit installer from its package folder. Existing custom script bindings are preserved.", 64, "Clash Verge Routing Kit"
