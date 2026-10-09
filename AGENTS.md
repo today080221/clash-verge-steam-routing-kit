@@ -210,6 +210,8 @@ When changing routing behavior:
 - remember that Unity global parent routing, Unity browser/account traffic, Unity global control traffic, Unity Editor API/package traffic, Unity global download traffic, Unity China traffic, NVIDIA service traffic, NVIDIA download traffic, Steam community traffic, mainland web traffic, and download traffic may need different routing behavior
 - keep `UnityChina` isolated from the global Unity path unless the user explicitly asks otherwise
 - keep installation and release docs aligned with actual script behavior
+- test complete subscriptions that already include all business groups, including UnityWeb pointing to UnityGlobal; validate every group reference for cycles, repeated application, and public/owner composition
+- distinguish migration of the legacy watcher from the user's active global script/card; installing SteamRoutingKit.js does not disable an old global script or prove the current subscription uses the new file
 
 When changing public-facing text:
 
@@ -229,6 +231,7 @@ Before finishing a change, check at least:
 - no sensitive local files are staged
 - `powershell.exe -NoProfile -ExecutionPolicy Bypass -File tests/run-tests.ps1` passes without machine configuration writes
 - release allowlist includes all runtime modules and domain data
+- fixed-hash files named in `.gitattributes` retain exact reviewed bytes in Git blobs and clean exports; do not normalize their line endings without updating deployment/downstream provenance
 
 ## Git Hygiene
 

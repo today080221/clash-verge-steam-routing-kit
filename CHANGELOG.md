@@ -4,6 +4,8 @@
 
 ### 亮点
 
+- 增加完整 24 组业务订阅的循环回归：公开 v1.5.0 脚本复现 `UnityGlobal → UnityWeb → UnityGlobal`，当前脚本的首次/重复/乱序输入与 Owner 组合均验证所有候选引用无环，公共路由逻辑保持不变。
+- 明确旧同步器迁移与当前全局脚本挂载的区别，以及 `main` 新能力尚未进入 v1.7.2 ZIP 的发行落差；固定哈希源采用 `.gitattributes` 保留原字节，避免 Git 自动换行导致下游校验漂移。
 - 安装器不再覆盖通用 `Script.js`；独立公共脚本用哈希记录所有权，手工修改会报冲突。
 - 退役所有订阅无条件重绑与自动重启，提供显式旧同步器迁移、原文件备份和公共层/Owner 增强组合入口。
 - 新增独立的 Claude 隐私工具：Chrome 定向 WebRTC 策略、已验证 Claude 程序路径的 UDP 出站阻止、状态/预览/启用/刷新/回滚。
@@ -24,6 +26,8 @@
 ---
 
 ### English Summary
+
+Add a complete 24-group subscription regression: the public v1.5.0 script reproduces the UnityGlobal/UnityWeb cycle, while current routing, repeated/reordered inputs and Owner composition remain acyclic across every choice. Public routing behavior is unchanged. Clarify that watcher migration preserves existing global-script bindings and that the v1.7.2 ZIP does not contain the new `main` features. Preserve fixed-hash source bytes through Git attributes so downstream provenance survives clean exports.
 
 Unreleased: preserve existing scripts and bindings; retire background rebinding; add explicit legacy migration and public/owner composition. Add optional scoped Claude privacy controls with previews, ownership-aware refresh/rollback, shared domain data, isolated tests, and explicit packaging. Explicit maintenance uses a protected deployment and same-user elevated two-minute/logon task; rollback disables maintenance before removing protection. A one-UAC entry checks real-task execution and rollback coordination, then restores protection, with a durable receipt and no unsupported UDP-enforcement claim. Public routing defaults remain unchanged. This machine's final `DesktopAndCli` scope passed both rule/effective-policy checks, task execution, rollback, prevention of queued-refresh reactivation, and final re-enablement, with existing Chrome policy unchanged. These results do not establish actual UDP blocking or Pro authentication. See the handoff for evidence and limits. No release has been published; `VERSION` remains `v1.7.2` until an authorized release.
 

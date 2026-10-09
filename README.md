@@ -91,6 +91,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\install-steam-routing.ps1 
 
 迁移只停止命令行 `-File` 精确指向本安装目录的旧同步进程，并把已识别的旧脚本与启动项改名为带随机标识的 `.disabled` 备份。未识别或修改过的版本需要先人工检查，不会盲目停进程或覆盖文件。原有订阅绑定完全保留；历史上已被改成空脚本的内容无法凭空恢复，需要从自己的备份恢复。不要重新启用旧同步器。
 
+### 完整分流订阅与旧增强冲突
+
+如果导入的订阅已包含 `UnityWeb → UnityGlobal` 等完整业务分组，仍挂载旧版全局脚本可能报 `loop [UnityGlobal UnityWeb]`：v1.5.0 的脚本不认识 `UnityWeb`，会把它反向加入 `UnityGlobal` 的候选出口。当前公共脚本已识别全部 12 个自有分组，并用含 24 个分组的订阅验证所有候选引用无环。
+
+`-MigrateLegacy` 只退役旧同步器和启动项，仍保留已挂载的全局 `Script.js`、增强卡片和订阅绑定。因此，复制出新的 `SteamRoutingKit.js` 不等于当前配置已经使用它。应在 Clash 中检查全局脚本及目标订阅的增强：先备份并识别旧公共层，再显式停用或更新其挂载；保留自己的 Owner 增强。订阅本身已提供完整公共分流时，无需再重复挂载公共层。最后重新加载目标订阅，确认不再报循环。
+
 ### 公共分流与自定义增强组合
 
 自定义脚本保持独立。用以下命令生成新文件，将结果放入一张单独的增强卡片，再明确选择需要使用它的订阅：
@@ -103,12 +109,16 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\compose-routing-script.ps1
 
 ## 通过 Release 快速安装
 
+截至 2026-10-09，最新公开发行仍为 [v1.7.2](https://github.com/today080221/clash-verge-steam-routing-kit/releases/tag/v1.7.2)。其公共脚本已包含 `UnityWeb`，但 ZIP 仍使用会覆盖通用脚本、安装后台同步器的旧安装流程，不含本页的新迁移模块与 Claude 隐私工具。需要现在使用这些新能力，请克隆 `main` 或下载完整的 `main` 源码；源码已更新不代表旧发行资产也更新。不要从 v1.7.2 ZIP 执行本页新增的迁移或隐私步骤。
+
+下列流程适用于后续包含新安装器的发行包；发布后再按新版本说明操作：
+
 1. 从 Releases 页面下载最新版本 zip。
 2. 解压到任意目录。
 3. 双击 `install-steam-routing.bat`。
 4. 按上面的说明创建/更新增强卡片并明确选择订阅；旧安装先执行安全迁移。
 
-你只需要下载一次。之后继续运行同一个 `install-steam-routing.bat`，它会先检查 GitHub 上是否有新的 Release；如果有，就会自动下载并切换到新版本后再执行安装。若 GitHub 检查超时，会在控制台提示你是只执行一次本地脚本，还是直接退出。
+之后继续运行同一个 `install-steam-routing.bat`，它会先检查 GitHub 上是否有版本号更高的 Release；如果有，就会自动下载并切换到新版本后再执行安装。它不会从 `main` 自动拉取未发布改动。若 GitHub 检查超时，会在控制台提示你是只执行一次本地脚本，还是直接退出。
 
 ## 可选 Claude 隐私防护
 

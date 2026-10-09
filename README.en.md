@@ -91,6 +91,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\install-steam-routing.ps1 
 
 Migration stops only legacy processes whose `-File` argument exactly matches this installation. Recognized legacy scripts and startup entries are renamed to uniquely named `.disabled` backups. Unknown or customized versions require manual review before proceeding. All subscription bindings are preserved. Previously lost script contents cannot be reconstructed; restore them from your own backups. Do not re-enable the old watcher.
 
+### Complete subscriptions and an old enhancement
+
+A subscription that already contains business groups such as `UnityWeb → UnityGlobal` can fail with `loop [UnityGlobal UnityWeb]` if an old global script remains attached. The v1.5.0 script does not recognize `UnityWeb` and adds it back as a choice under `UnityGlobal`. The current script recognizes all 12 managed groups; a 24-group subscription regression checks every selectable reference for cycles.
+
+`-MigrateLegacy` retires only the watcher and startup entry. It preserves the attached global `Script.js`, enhancement cards and subscription bindings. Creating a new `SteamRoutingKit.js` file therefore does not establish that the active configuration uses it. Inspect the global script and the target subscription's enhancements in Clash: back up and identify the old public layer, then explicitly detach or update it while retaining your Owner enhancement. A subscription that already supplies the complete public routing layer does not need that layer attached again. Reload the target subscription and verify that the cycle error is gone.
+
 ### Compose public routing with an owner enhancement
 
 Keep the custom source separate. Generate a new file, place it in a separate enhancement card, and explicitly select the intended subscriptions:
@@ -103,12 +109,16 @@ Each script retains its own `main` and helper scope. The public `main(config)` r
 
 ## Quick Install from a Release
 
+As of 2026-10-09, the latest public release is still [v1.7.2](https://github.com/today080221/clash-verge-steam-routing-kit/releases/tag/v1.7.2). Its public script includes `UnityWeb`, but the ZIP retains the old installer that overwrites generic scripts and installs a background watcher. It does not include the new migration modules or Claude privacy tools described here. To use these features now, clone `main` or download its complete source. Updated source does not update older release assets. Do not use the v1.7.2 ZIP for the new migration or privacy steps on this page.
+
+The following flow applies to a future release containing the new installer; follow that version's instructions once published:
+
 1. Download the latest release zip from the Releases page.
 2. Extract it to any folder.
 3. Double-click `install-steam-routing.bat`.
 4. Create/update the enhancement card and explicitly select subscriptions as described above. Migrate older installations first.
 
-You only need to download the package once. After that, keep using the same `install-steam-routing.bat`: it checks GitHub for newer releases before running the installer, downloads updates automatically when available, and falls back to a console prompt if the GitHub check times out.
+Keep using the same `install-steam-routing.bat`: it checks GitHub for releases with a higher version, downloads an update when available, and falls back to a console prompt if the check times out. It does not fetch unpublished changes from `main`.
 
 ## Optional Claude Privacy Protection
 

@@ -1,0 +1,210 @@
+{
+  "proxies": [
+    {
+      "name": "FixtureNode",
+      "type": "ss"
+    }
+  ],
+  "proxy-groups": [
+    {
+      "name": "UnityGlobal",
+      "type": "select",
+      "proxies": [
+        "Proxy",
+        "DIRECT"
+      ]
+    },
+    {
+      "name": "UnityHub",
+      "type": "select",
+      "proxies": [
+        "UnityGlobal",
+        "Proxy",
+        "DIRECT"
+      ]
+    },
+    {
+      "name": "UnityWeb",
+      "type": "select",
+      "proxies": [
+        "UnityGlobal",
+        "Proxy",
+        "DIRECT"
+      ]
+    },
+    {
+      "name": "UnityEditor",
+      "type": "select",
+      "proxies": [
+        "UnityGlobal",
+        "Proxy",
+        "DIRECT"
+      ]
+    },
+    {
+      "name": "UnityDownload",
+      "type": "select",
+      "proxies": [
+        "UnityGlobal",
+        "Proxy",
+        "DIRECT"
+      ]
+    },
+    {
+      "name": "UnityChina",
+      "type": "select",
+      "proxies": [
+        "REJECT",
+        "Proxy",
+        "DIRECT"
+      ]
+    },
+    {
+      "name": "NvidiaServices",
+      "type": "select",
+      "proxies": [
+        "DIRECT",
+        "Proxy"
+      ]
+    },
+    {
+      "name": "NvidiaDownload",
+      "type": "select",
+      "proxies": [
+        "DIRECT",
+        "Proxy"
+      ]
+    },
+    {
+      "name": "SteamCommunity",
+      "type": "select",
+      "proxies": [
+        "Proxy",
+        "DIRECT"
+      ]
+    },
+    {
+      "name": "SteamMainland",
+      "type": "select",
+      "proxies": [
+        "Proxy",
+        "DIRECT"
+      ]
+    },
+    {
+      "name": "SteamDownload",
+      "type": "select",
+      "proxies": [
+        "DIRECT",
+        "Proxy"
+      ]
+    },
+    {
+      "name": "BilibiliVideo",
+      "type": "select",
+      "proxies": [
+        "DIRECT",
+        "Proxy"
+      ]
+    },
+    {
+      "name": "Proxy",
+      "type": "select",
+      "proxies": [
+        "FixtureNode"
+      ]
+    },
+    {
+      "name": "AI",
+      "type": "select",
+      "proxies": [
+        "Proxy",
+        "DIRECT"
+      ]
+    },
+    {
+      "name": "GitHub",
+      "type": "select",
+      "proxies": [
+        "Proxy",
+        "DIRECT"
+      ]
+    },
+    {
+      "name": "Developer",
+      "type": "select",
+      "proxies": [
+        "Proxy",
+        "DIRECT"
+      ]
+    },
+    {
+      "name": "Microsoft",
+      "type": "select",
+      "proxies": [
+        "DIRECT",
+        "Proxy"
+      ]
+    },
+    {
+      "name": "Apple",
+      "type": "select",
+      "proxies": [
+        "DIRECT",
+        "Proxy"
+      ]
+    },
+    {
+      "name": "Google",
+      "type": "select",
+      "proxies": [
+        "Proxy",
+        "DIRECT"
+      ]
+    },
+    {
+      "name": "YouTube",
+      "type": "select",
+      "proxies": [
+        "Proxy",
+        "DIRECT"
+      ]
+    },
+    {
+      "name": "Streaming",
+      "type": "select",
+      "proxies": [
+        "Proxy",
+        "DIRECT"
+      ]
+    },
+    {
+      "name": "Telegram",
+      "type": "select",
+      "proxies": [
+        "Proxy",
+        "DIRECT"
+      ]
+    },
+    {
+      "name": "China",
+      "type": "select",
+      "proxies": [
+        "DIRECT",
+        "Proxy"
+      ]
+    },
+    {
+      "name": "Other",
+      "type": "select",
+      "proxies": [
+        "Proxy",
+        "DIRECT"
+      ]
+    }
+  ],
+  "rules": [
+    "DOMAIN,fixture.example,AI",
+    "MATCH,Other"
+  ]
+}
